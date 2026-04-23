@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus } from "lucide-react";
+import zooyImg from "@/assets/zooy.jpg";
+import zooy2Img from "@/assets/zooy2.jpg";
+import jedImg from "@/assets/jed.jpg";
+import jed2Img from "@/assets/jed2.jpg";
 
-type Product = { id: string; name: string; desc: string; price: number };
+type Product = { id: string; name: string; desc: string; price: number; image: string };
 
 const products: Product[] = [
-  { id: "zooy", name: "ZOOY", desc: "Klasyk w lekkiej formule.", price: 40 },
-  { id: "zooy2", name: "ZOOY 2", desc: "Subtelniejsza odsłona.", price: 30 },
-  { id: "jed", name: "JED", desc: "Bogata, premium kompozycja.", price: 60 },
-  { id: "jed2", name: "JED 2", desc: "Limitowana, głęboka edycja.", price: 60 },
+  { id: "zooy", name: "ZOOY", desc: "Klasyk w lekkiej formule.", price: 40, image: zooyImg },
+  { id: "zooy2", name: "ZOOY 2", desc: "Subtelniejsza odsłona.", price: 30, image: zooy2Img },
+  { id: "jed", name: "JED", desc: "Bogata, premium kompozycja.", price: 60, image: jedImg },
+  { id: "jed2", name: "JED 2", desc: "Limitowana, głęboka edycja.", price: 60, image: jed2Img },
 ];
 
 const Index = () => {
@@ -40,7 +44,15 @@ const Index = () => {
 
         <ul className="divide-y divide-border/60 border-y border-border/60">
           {products.map((p) => (
-            <li key={p.id} className="py-6 flex items-center gap-6">
+            <li key={p.id} className="py-6 flex items-center gap-4 sm:gap-6">
+              <img
+                src={p.image}
+                alt={`Produkt ${p.name}`}
+                width={768}
+                height={768}
+                loading="lazy"
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-md object-cover border border-border/60 shrink-0"
+              />
               <div className="flex-1 min-w-0">
                 <h2 className="font-display text-2xl">{p.name}</h2>
                 <p className="text-sm text-muted-foreground">{p.desc}</p>
