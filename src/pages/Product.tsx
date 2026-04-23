@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check } from "lucide-react";
-import { findProduct } from "@/data/products";
+import { findProduct, unitPriceFor } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 const Product = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = id ? findProduct(id) : undefined;
-  const { add } = useCart();
+  const { add, qtyOfProduct } = useCart();
   const [flavor, setFlavor] = useState<string | null>(null);
 
   if (!product) {
@@ -22,6 +22,9 @@ const Product = () => {
       </div>
     );
   }
+
+  const currentQty = qtyOfProduct(product.id);
+  const currentUnit = unitPriceFor(product, currentQty);
 
   const handleAdd = () => {
     if (!flavor) return;
@@ -50,8 +53,35 @@ const Product = () => {
         <div>
           <p className="text-gold text-xs uppercase tracking-[0.3em] mb-3">— Produkt</p>
           <h1 className="font-display text-5xl mb-2">{product.name}</h1>
-          <p className="font-display text-2xl text-gold mb-6">{product.price} zł</p>
+          <p className="font-display text-2xl text-gold mb-6">{currentUnit} zł / szt.</p>
           <p className="text-muted-foreground leading-relaxed mb-8">{product.longDesc}</p>
+
+          {product.tiers && (
+            <div className="mb-8 border border-border/60 rounded-md overflow-hidden">
+              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground px-4 pt-3">
+                Cena za sztukę
+              </p>
+              <ul className="divide-y divide-border/40">
+                {product.tiers.map((t) => {
+                  const active = currentQty >= t.minQty &&
+                    !product.tiers!.some((x) => x.minQty > t.minQty && currentQty >= x.minQty);
+                  return (
+                    <li
+                      key={t.minQty}
+                      className={`flex items-center justify-between px-4 py-3 text-sm ${
+                        active ? "bg-gold/10 text-gold" : "text-muted-foreground"
+                      }`}
+                    >
+                      <span>
+                        {t.minQty === 1 ? "1+ szt." : `${t.minQty}+ szt.`}
+                      </span>
+                      <span className="font-display text-base">{t.price} zł / szt.</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
 
           <div className="mb-8">
             <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">

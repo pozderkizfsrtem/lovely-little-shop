@@ -3,6 +3,8 @@ import zooy2Img from "@/assets/zooy2.jpg";
 import jedImg from "@/assets/jed.jpg";
 import jed2Img from "@/assets/jed2.jpg";
 
+export type PriceTier = { minQty: number; price: number };
+
 export type Product = {
   id: string;
   name: string;
@@ -11,7 +13,15 @@ export type Product = {
   price: number;
   image: string;
   flavors: string[];
+  /** Volume pricing tiers (per unit). Sorted ascending by minQty. */
+  tiers?: PriceTier[];
 };
+
+const zooyTiers: PriceTier[] = [
+  { minQty: 1, price: 40 },
+  { minQty: 20, price: 38 },
+  { minQty: 50, price: 35 },
+];
 
 export const products: Product[] = [
   {
@@ -23,6 +33,7 @@ export const products: Product[] = [
     price: 40,
     image: zooyImg,
     flavors: ["Klasyczny", "Wanilia", "Cytrus", "Mięta"],
+    tiers: zooyTiers,
   },
   {
     id: "zooy2",
@@ -30,9 +41,10 @@ export const products: Product[] = [
     desc: "Subtelniejsza odsłona.",
     longDesc:
       "Druga edycja kultowej linii — delikatniejsza, bardziej stonowana, z czystym profilem.",
-    price: 30,
+    price: 40,
     image: zooy2Img,
     flavors: ["Klasyczny", "Bergamotka", "Zielona herbata"],
+    tiers: zooyTiers,
   },
   {
     id: "jed",
@@ -57,3 +69,14 @@ export const products: Product[] = [
 ];
 
 export const findProduct = (id: string) => products.find((p) => p.id === id);
+
+/** Returns unit price for a given product at a given total quantity. */
+export const unitPriceFor = (product: Product, qty: number): number => {
+  if (!product.tiers || product.tiers.length === 0) return product.price;
+  const sorted = [...product.tiers].sort((a, b) => a.minQty - b.minQty);
+  let price = sorted[0].price;
+  for (const t of sorted) {
+    if (qty >= t.minQty) price = t.price;
+  }
+  return price;
+};
