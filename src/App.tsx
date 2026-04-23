@@ -3,8 +3,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { CartProvider } from "@/context/CartContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index.tsx";
+import Product from "./pages/Product.tsx";
 import About from "./pages/About.tsx";
 import Delivery from "./pages/Delivery.tsx";
 import Payment from "./pages/Payment.tsx";
@@ -21,22 +23,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Index />} />
-            <Route path="/o-sklepie" element={<About />} />
-            <Route path="/dostawa" element={<Delivery />} />
-            <Route path="/platnosc" element={<Payment />} />
-            <Route path="/zwroty" element={<Returns />} />
-            <Route path="/promocje" element={<Promotions />} />
-            <Route path="/faq" element={<Faq />} />
-            <Route path="/opinie" element={<Reviews />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Index />} />
+              <Route path="/produkt/:id" element={<Product />} />
+              <Route path="/o-sklepie" element={<About />} />
+              <Route path="/dostawa" element={<Delivery />} />
+              <Route path="/platnosc" element={<Payment />} />
+              <Route path="/zwroty" element={<Returns />} />
+              <Route path="/promocje" element={<Promotions />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="/opinie" element={<Reviews />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
