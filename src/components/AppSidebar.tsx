@@ -29,7 +29,7 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side="right">
       <SidebarHeader className="px-4 py-5 border-b border-sidebar-border">
         {!collapsed && (
           <span className="font-display text-xl">
