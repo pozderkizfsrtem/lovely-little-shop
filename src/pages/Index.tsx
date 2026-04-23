@@ -5,7 +5,7 @@ import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 const Index = () => {
-  const { items, add, sub, count, total } = useCart();
+  const { items, add, sub, count, total, unitPriceOfProduct } = useCart();
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -38,7 +38,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground">{p.desc}</p>
               </Link>
               <span className="font-display text-xl text-gold whitespace-nowrap">
-                {p.price} zł
+                {p.tiers ? `od ${p.tiers[p.tiers.length - 1].price}` : p.price} zł
               </span>
               <Link to={`/produkt/${p.id}`}>
                 <Button
@@ -59,6 +59,7 @@ const Index = () => {
               {items.map((i) => {
                 const p = findProduct(i.productId);
                 if (!p) return null;
+                const unit = unitPriceOfProduct(i.productId);
                 return (
                   <li
                     key={`${i.productId}-${i.flavor}`}
@@ -66,9 +67,11 @@ const Index = () => {
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-display text-lg">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">Smak: {i.flavor}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Smak: {i.flavor} · {unit} zł / szt.
+                      </p>
                     </div>
-                    <span className="text-sm text-gold">{p.price * i.qty} zł</span>
+                    <span className="text-sm text-gold">{unit * i.qty} zł</span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => sub(i.productId, i.flavor)}

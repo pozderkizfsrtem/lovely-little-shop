@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState, ReactNode } from "react";
-import { products } from "@/data/products";
+import { products, unitPriceFor } from "@/data/products";
 
 export type CartItem = { productId: string; flavor: string; qty: number };
 
@@ -7,6 +7,10 @@ type CartContextValue = {
   items: CartItem[];
   add: (productId: string, flavor: string) => void;
   sub: (productId: string, flavor: string) => void;
+  /** Total quantity across all flavors of a product. */
+  qtyOfProduct: (productId: string) => number;
+  /** Current per-unit price for the product based on volume tiers. */
+  unitPriceOfProduct: (productId: string) => number;
   count: number;
   total: number;
 };
@@ -39,12 +43,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
 
   const value = useMemo(() => {
+    const qtyOfProduct = (productId: string) =>
+      items.filter((i) => i.productId === productId).reduce((s, i) => s + i.qty, 0);
+
+    const unitPriceOfProduct = (productId: string) => {
+      const p = products.find((p) => p.id === productId);
+      if (!p) return 0;
+      return unitPriceFor(p, qtyOfProduct(productId));
+    };
+
     const count = items.reduce((s, i) => s + i.qty, 0);
-    const total = items.reduce((s, i) => {
-      const p = products.find((p) => p.id === i.productId);
-      return s + (p?.price ?? 0) * i.qty;
-    }, 0);
-    return { items, add, sub, count, total };
+    const total = items.reduce(
+      (s, i) => s + unitPriceOfProduct(i.productId) * i.qty,
+      0,
+    );
+
+    return { items, add, sub, count, total, qtyOfProduct, unitPriceOfProduct };
   }, [items]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
