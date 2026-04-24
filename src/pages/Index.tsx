@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, X } from "lucide-react";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 
 const Index = () => {
-  const { items, add, sub, count, total, unitPriceOfProduct } = useCart();
+  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -62,6 +62,8 @@ const Index = () => {
                 const unit = unitPriceOfProduct(pid);
                 const lines = items.filter((i) => i.productId === pid);
                 const totalQty = lines.reduce((s, i) => s + i.qty, 0);
+                const usedFlavors = new Set(lines.map((l) => l.flavor));
+                const remainingFlavors = p.flavors.filter((f) => !usedFlavors.has(f));
                 return (
                   <li
                     key={pid}
@@ -101,10 +103,38 @@ const Index = () => {
                             >
                               <Plus className="w-3 h-3" />
                             </button>
+                            <button
+                              onClick={() => removeFlavor(i.productId, i.flavor)}
+                              aria-label={`Usuń smak ${i.flavor}`}
+                              className="ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                              Usuń smak
+                            </button>
                           </div>
                         </li>
                       ))}
                     </ul>
+
+                    {remainingFlavors.length > 0 && (
+                      <div className="mt-3 pl-3">
+                        <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                          Dostępne smaki
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {remainingFlavors.map((f) => (
+                            <button
+                              key={f}
+                              onClick={() => add(pid, f)}
+                              className="px-3 py-1 rounded-full border border-border hover:border-gold text-xs text-muted-foreground hover:text-gold transition-colors inline-flex items-center gap-1"
+                            >
+                              <Plus className="w-3 h-3" />
+                              {f}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </li>
                 );
               })}
