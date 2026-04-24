@@ -148,9 +148,11 @@ const Index = () => {
               {count} {count === 1 ? "produkt" : "produkty"}
             </span>
             <span className="font-display text-lg text-gold">{total} zł</span>
-            <Button size="sm" className="rounded-full gradient-gold text-primary-foreground">
-              Zamów
-            </Button>
+            <Link to="/zamowienie">
+              <Button size="sm" className="rounded-full gradient-gold text-primary-foreground">
+                Zamów
+              </Button>
+            </Link>
           </div>
         )}
 
