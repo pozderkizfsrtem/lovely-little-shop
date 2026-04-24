@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check } from "lucide-react";
 import { findProduct, unitPriceFor } from "@/data/products";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/context/useCart";
 
 const Product = () => {
   const { id } = useParams();
