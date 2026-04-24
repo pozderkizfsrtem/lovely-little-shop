@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useCart } from "@/context/useCart";
 import { findProduct } from "@/data/products";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   firstName: z.string().trim().min(1, "Podaj imię").max(60),
@@ -23,6 +24,7 @@ const schema = z.object({
 
 const Checkout = () => {
   const { items, total, count, unitPriceOfProduct } = useCart();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
@@ -36,7 +38,7 @@ const Checkout = () => {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = schema.safeParse(form);
     if (!res.success) {
@@ -48,8 +50,26 @@ const Checkout = () => {
       return;
     }
     setErrors({});
-    toast.success("Zamówienie złożone — dziękujemy!");
-    navigate("/");
+    setSubmitting(true);
+    try {
+      const orderItems = items.map((i) => {
+        const p = findProduct(i.productId);
+        return { product: p?.name ?? i.productId, flavor: i.flavor, qty: i.qty };
+      });
+      const { data, error } = await supabase.functions.invoke("send-order", {
+        body: { ...res.data, items: orderItems, total },
+      });
+      if (error || !data?.success) {
+        throw new Error(error?.message || data?.error || "Błąd wysyłki");
+      }
+      toast.success("Zamówienie złożone — dziękujemy!");
+      navigate("/");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Nieznany błąd";
+      toast.error(`Nie udało się wysłać zamówienia: ${msg}`);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (count === 0) {
@@ -138,8 +158,12 @@ const Checkout = () => {
             <Link to="/" className="text-sm text-muted-foreground hover:text-gold">
               ← Wróć do sklepu
             </Link>
-            <Button type="submit" className="rounded-full gradient-gold text-primary-foreground px-8">
-              Złóż zamówienie · {total} zł
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="rounded-full gradient-gold text-primary-foreground px-8"
+            >
+              {submitting ? "Wysyłanie…" : `Złóż zamówienie · ${total} zł`}
             </Button>
           </div>
         </form>
