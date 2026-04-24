@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useCart } from "@/context/useCart";
 import { findProduct } from "@/data/products";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { getTelegramUser } from "@/lib/telegram";
 
 const schema = z.object({
   firstName: z.string().trim().min(1, "Podaj imię").max(60),
@@ -34,6 +35,16 @@ const Checkout = () => {
     paczkomat: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const u = getTelegramUser();
+    if (!u) return;
+    setForm((p) => ({
+      ...p,
+      firstName: p.firstName || u.first_name || "",
+      lastName: p.lastName || u.last_name || "",
+    }));
+  }, []);
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
