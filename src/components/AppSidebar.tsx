@@ -1,8 +1,9 @@
-import { Info, Truck, CreditCard, RotateCcw, Tag, HelpCircle, Star, Store } from "lucide-react";
+import { Info, Truck, CreditCard, RotateCcw, Tag, HelpCircle, Star, Store, Mail } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -61,6 +62,15 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-3 border-t border-sidebar-border">
+        <NavLink
+          to="/kontakt"
+          className="flex items-center justify-center gap-2 rounded-md bg-gold px-4 py-2.5 text-sm font-medium text-background shadow-md transition-all hover:bg-gold/90 hover:shadow-lg hover:-translate-y-0.5"
+        >
+          <Mail className="h-4 w-4" />
+          {!collapsed && <span>Kontakt</span>}
+        </NavLink>
+      </SidebarFooter>
     </Sidebar>
   );
 }
