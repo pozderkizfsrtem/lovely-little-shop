@@ -1,8 +1,9 @@
-import { Info, Truck, CreditCard, RotateCcw, Tag, HelpCircle, Star, Store } from "lucide-react";
+import { Info, Truck, CreditCard, RotateCcw, Tag, HelpCircle, Star, Store, Mail } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
