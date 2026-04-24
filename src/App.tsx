@@ -14,6 +14,7 @@ import Returns from "./pages/Returns.tsx";
 import Promotions from "./pages/Promotions.tsx";
 import Faq from "./pages/Faq.tsx";
 import Reviews from "./pages/Reviews.tsx";
+import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
