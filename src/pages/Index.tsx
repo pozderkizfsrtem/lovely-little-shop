@@ -55,38 +55,56 @@ const Index = () => {
         {items.length > 0 && (
           <div className="mt-12 border border-border/60 rounded-lg p-6">
             <h3 className="font-display text-2xl mb-4">Twój koszyk</h3>
-            <ul className="space-y-3">
-              {items.map((i) => {
-                const p = findProduct(i.productId);
+            <ul className="space-y-4">
+              {Array.from(new Set(items.map((i) => i.productId))).map((pid) => {
+                const p = findProduct(pid);
                 if (!p) return null;
-                const unit = unitPriceOfProduct(i.productId);
+                const unit = unitPriceOfProduct(pid);
+                const lines = items.filter((i) => i.productId === pid);
+                const totalQty = lines.reduce((s, i) => s + i.qty, 0);
                 return (
                   <li
-                    key={`${i.productId}-${i.flavor}`}
-                    className="flex items-center gap-4 py-2 border-b border-border/40 last:border-0"
+                    key={pid}
+                    className="py-3 border-b border-border/40 last:border-0"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display text-lg">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Smak: {i.flavor} · {unit} zł / szt.
-                      </p>
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display text-lg">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {unit} zł / szt. · {totalQty} szt.
+                        </p>
+                      </div>
+                      <span className="text-sm text-gold whitespace-nowrap">
+                        {unit * totalQty} zł
+                      </span>
                     </div>
-                    <span className="text-sm text-gold">{unit * i.qty} zł</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => sub(i.productId, i.flavor)}
-                        className="w-7 h-7 rounded-full border border-border hover:border-gold flex items-center justify-center"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="w-5 text-center text-sm">{i.qty}</span>
-                      <button
-                        onClick={() => add(i.productId, i.flavor)}
-                        className="w-7 h-7 rounded-full border border-border hover:border-gold flex items-center justify-center"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
+                    <ul className="space-y-2 pl-3 border-l border-border/40">
+                      {lines.map((i) => (
+                        <li
+                          key={`${i.productId}-${i.flavor}`}
+                          className="flex items-center gap-3"
+                        >
+                          <span className="flex-1 text-sm text-muted-foreground">
+                            {i.flavor}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => sub(i.productId, i.flavor)}
+                              className="w-7 h-7 rounded-full border border-border hover:border-gold flex items-center justify-center"
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="w-5 text-center text-sm">{i.qty}</span>
+                            <button
+                              onClick={() => add(i.productId, i.flavor)}
+                              className="w-7 h-7 rounded-full border border-border hover:border-gold flex items-center justify-center"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 );
               })}
