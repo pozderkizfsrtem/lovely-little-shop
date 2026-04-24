@@ -143,13 +143,13 @@ const Index = () => {
         )}
 
         {count > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-card border border-gold/40 rounded-full pl-6 pr-2 py-2 flex items-center gap-4 shadow-gold z-40">
-            <span className="text-sm text-muted-foreground">
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-card border border-gold/40 rounded-full pl-5 pr-2 py-2 flex items-center gap-3 sm:gap-4 shadow-gold z-40 whitespace-nowrap max-w-[calc(100vw-1.5rem)]">
+            <span className="text-sm text-muted-foreground leading-none">
               {count} {count === 1 ? "produkt" : "produkty"}
             </span>
-            <span className="font-display text-lg text-gold">{total} zł</span>
-            <Link to="/zamowienie">
-              <Button size="sm" className="rounded-full gradient-gold text-primary-foreground">
+            <span className="font-display text-lg text-gold leading-none">{total} zł</span>
+            <Link to="/zamowienie" className="shrink-0">
+              <Button size="sm" className="rounded-full gradient-gold text-primary-foreground leading-none">
                 Zamów
               </Button>
             </Link>
