@@ -11,7 +11,7 @@ const Index = () => {
     <main className="min-h-screen bg-background text-foreground">
       <div className="max-w-2xl mx-auto px-6 py-20">
         <header className="mb-16">
-          <p className="text-gold text-xs uppercase tracking-[0.3em] mb-4">— Sklep</p>
+          <p className="text-gold text-xs uppercase tracking-[0.3em] mb-4">PuffBot</p>
           <h1 className="font-display text-5xl md:text-6xl leading-tight">
             Cztery produkty.<br />
             <span className="italic text-gold">Nic więcej.</span>
