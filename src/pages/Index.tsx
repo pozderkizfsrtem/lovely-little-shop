@@ -1,11 +1,47 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info } from "lucide-react";
+import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 
+const LANGUAGES = [
+  { code: "PL", label: "Polski", flag: "🇵🇱" },
+  { code: "EN", label: "English", flag: "🇬🇧" },
+  { code: "UA", label: "Українська", flag: "🇺🇦" },
+] as const;
+
+const MENU_ITEMS = [
+  { label: "Sklep", to: "/" },
+  { label: "O sklepie", to: "/o-sklepie" },
+  { label: "Dostawa", to: "/dostawa" },
+  { label: "Płatność", to: "/platnosc" },
+  { label: "Zwroty i wymiany", to: "/zwroty" },
+  { label: "Zasady promocji", to: "/promocje" },
+  { label: "Najczęstsze pytania", to: "/faq" },
+  { label: "Opinie klientów", to: "/opinie" },
+  { label: "Kontakt", to: "/kontakt" },
+];
+
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
+  const [lang, setLang] = useState<"PL" | "EN" | "UA">("PL");
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -20,10 +56,27 @@ const Index = () => {
               className="bg-transparent flex-1 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <button className="flex items-center gap-1 text-sm" aria-label="Język">
-            <Globe className="w-5 h-5" />
-            <span className="font-semibold">PL</span>
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm hover:text-primary transition-colors outline-none" aria-label="Język">
+              <Globe className="w-5 h-5" />
+              <span className="font-semibold">{lang}</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuLabel>Język / Language</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {LANGUAGES.map((l) => (
+                <DropdownMenuItem
+                  key={l.code}
+                  onClick={() => setLang(l.code)}
+                  className="cursor-pointer flex items-center gap-2"
+                >
+                  <span className="text-base">{l.flag}</span>
+                  <span className="flex-1">{l.label}</span>
+                  {lang === l.code && <Check className="w-4 h-4 text-primary" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Link to="/zamowienie" className="relative" aria-label="Koszyk">
             <ShoppingCart className="w-5 h-5" />
             {count > 0 && (
@@ -32,9 +85,28 @@ const Index = () => {
               </span>
             )}
           </Link>
-          <button aria-label="Menu">
-            <Menu className="w-5 h-5" />
-          </button>
+          <Sheet>
+            <SheetTrigger aria-label="Menu" className="hover:text-primary transition-colors outline-none">
+              <Menu className="w-5 h-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-card border-border">
+              <SheetHeader>
+                <SheetTitle className="text-left text-xl uppercase tracking-wide">Menu</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col">
+                {MENU_ITEMS.map((item) => (
+                  <SheetClose asChild key={item.to}>
+                    <Link
+                      to={item.to}
+                      className="py-3 px-2 text-sm font-medium border-b border-border/50 hover:text-primary transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  </SheetClose>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
 
         {/* Filter bar */}
