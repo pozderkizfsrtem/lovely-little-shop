@@ -149,18 +149,18 @@ const Index = () => {
                       {p.name}
                     </h2>
                   </Link>
-                  <p className="text-orange font-bold text-base mt-1">{basePrice} zł</p>
+                  <p className="text-orange font-bold text-base mt-1">{basePrice} {t.currency}</p>
                 </div>
 
                 {p.tiers && p.tiers.length > 1 && (
                   <div className="px-3 py-3 border-t border-border/60">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">Smart Cena</p>
+                    <p className="text-xs font-semibold text-muted-foreground mb-2">{t.smartPrice}</p>
                     <ul className="space-y-1">
                       {p.tiers
-                        .filter((t) => t.minQty > 1)
-                        .map((t) => (
-                          <li key={t.minQty} className="text-xs text-muted-foreground">
-                            od {t.minQty} szt – <span className="text-foreground">{t.price} zł</span>
+                        .filter((tier) => tier.minQty > 1)
+                        .map((tier) => (
+                          <li key={tier.minQty} className="text-xs text-muted-foreground">
+                            {t.fromQty} {tier.minQty} {t.pieces} – <span className="text-foreground">{tier.price} {t.currency}</span>
                           </li>
                         ))}
                     </ul>
@@ -170,7 +170,7 @@ const Index = () => {
                 <div className="px-3 pb-3 mt-auto">
                   <Link to={`/produkt/${p.id}`} className="block">
                     <Button className="w-full gradient-orange text-primary-foreground font-semibold rounded-lg h-10 hover:opacity-95">
-                      Wybierz
+                      {t.choose}
                     </Button>
                   </Link>
                 </div>
@@ -183,8 +183,8 @@ const Index = () => {
         {items.length > 0 && (
           <div className="mt-8 card-glow rounded-xl p-5 animate-fade-up">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-xl uppercase">Twój koszyk</h3>
-              <span className="text-xs font-semibold text-orange">{count} szt.</span>
+              <h3 className="font-bold text-xl uppercase">{t.yourCart}</h3>
+              <span className="text-xs font-semibold text-orange">{count} {t.pcs}</span>
             </div>
             <ul className="space-y-4">
               {Array.from(new Set(items.map((i) => i.productId))).map((pid) => {
@@ -201,17 +201,17 @@ const Index = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-bold uppercase">{p.name}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {unit} zł / szt. · {totalQty} szt.
+                          {unit} {t.perPiece} · {totalQty} {t.pcs}
                         </p>
                       </div>
                       <span className="font-bold text-orange whitespace-nowrap">
-                        {unit * totalQty} zł
+                        {unit * totalQty} {t.currency}
                       </span>
                     </div>
                     <ul className="space-y-2 pl-3 border-l-2 border-primary/40">
-                      {lines.map((i) => (
+                       {lines.map((i) => (
                         <li key={`${i.productId}-${i.flavor}`} className="flex items-center gap-3">
-                          <span className="flex-1 text-sm text-muted-foreground">{i.flavor}</span>
+                          <span className="flex-1 text-sm text-muted-foreground">{tFlavor(i.flavor)}</span>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => sub(i.productId, i.flavor)}
@@ -228,10 +228,10 @@ const Index = () => {
                             </button>
                             <button
                               onClick={() => removeFlavor(i.productId, i.flavor)}
-                              aria-label={`Usuń smak ${i.flavor}`}
+                              aria-label={`${t.removeFlavor} ${tFlavor(i.flavor)}`}
                               className="ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
                             >
-                              <X className="w-3 h-3" /> Usuń
+                              <X className="w-3 h-3" /> {t.remove}
                             </button>
                           </div>
                         </li>
@@ -241,7 +241,7 @@ const Index = () => {
                     {remainingFlavors.length > 0 && (
                       <div className="mt-3 pl-3">
                         <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
-                          Dostępne smaki
+                          {t.availableFlavors}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {remainingFlavors.map((f) => (
@@ -251,7 +251,7 @@ const Index = () => {
                               className="px-3 py-1 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                             >
                               <Plus className="w-3 h-3" />
-                              {f}
+                              {tFlavor(f)}
                             </button>
                           ))}
                         </div>
@@ -265,7 +265,7 @@ const Index = () => {
         )}
 
         <footer className="mt-12 pt-6 border-t border-border text-xs text-muted-foreground text-center">
-          © 2026 PuffBot — hello@maison.com
+          {t.footer}
         </footer>
 
         {count > 0 && <div className="h-24" aria-hidden />}
@@ -275,17 +275,17 @@ const Index = () => {
       {count > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-card border border-border rounded-full px-2 py-2 flex items-center gap-2 shadow-orange z-40 whitespace-nowrap max-w-[calc(100vw-1.5rem)]">
           <span className="inline-flex h-9 items-center px-3 text-xs font-semibold text-muted-foreground">
-            {count} szt.
+            {count} {t.pcs}
           </span>
           <span className="inline-flex h-9 items-center px-1 font-bold text-lg text-orange">
-            {total} zł
+            {total} {t.currency}
           </span>
           <Link to="/zamowienie" className="shrink-0 inline-flex">
             <Button
               size="sm"
               className="h-9 rounded-full gradient-orange text-primary-foreground px-6 font-semibold uppercase tracking-wide"
             >
-              Zamów
+              {t.order}
             </Button>
           </Link>
         </div>
