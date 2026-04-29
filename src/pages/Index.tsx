@@ -1,11 +1,47 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info } from "lucide-react";
+import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 
+const LANGUAGES = [
+  { code: "PL", label: "Polski", flag: "🇵🇱" },
+  { code: "EN", label: "English", flag: "🇬🇧" },
+  { code: "UA", label: "Українська", flag: "🇺🇦" },
+] as const;
+
+const MENU_ITEMS = [
+  { label: "Sklep", to: "/" },
+  { label: "O sklepie", to: "/o-sklepie" },
+  { label: "Dostawa", to: "/dostawa" },
+  { label: "Płatność", to: "/platnosc" },
+  { label: "Zwroty i wymiany", to: "/zwroty" },
+  { label: "Zasady promocji", to: "/promocje" },
+  { label: "Najczęstsze pytania", to: "/faq" },
+  { label: "Opinie klientów", to: "/opinie" },
+  { label: "Kontakt", to: "/kontakt" },
+];
+
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
+  const [lang, setLang] = useState<"PL" | "EN" | "UA">("PL");
 
   return (
     <main className="min-h-screen bg-background text-foreground">
