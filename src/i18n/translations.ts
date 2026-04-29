@@ -178,6 +178,6 @@ export const translations: Record<Lang, Dict> = {
       Trufla: "Трюфель",
     } as Record<string, string>,
   },
-} as const;
+};
 
-export type Translation = typeof translations.PL;
+export type Translation = Dict;
