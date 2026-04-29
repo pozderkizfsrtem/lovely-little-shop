@@ -15,7 +15,7 @@
     --popover: 0 0% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 22 100% 55%;            /* orange CTA */
+    --primary: 210 100% 56%;           /* blue CTA */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 14%;
@@ -24,7 +24,7 @@
     --muted: 0 0% 16%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 22 100% 55%;
+    --accent: 210 100% 56%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 80% 55%;
@@ -32,30 +32,30 @@
 
     --border: 0 0% 18%;
     --input: 0 0% 16%;
-    --ring: 22 100% 55%;
+    --ring: 210 100% 56%;
 
     --radius: 0.625rem;
 
-    --orange: 22 100% 55%;
-    --orange-bright: 28 100% 60%;
-    --gradient-orange: linear-gradient(135deg, hsl(28 100% 60%), hsl(18 100% 50%));
-    --shadow-orange: 0 14px 40px -14px hsl(22 100% 55% / 0.5);
+    --orange: 210 100% 60%;
+    --orange-bright: 195 100% 60%;
+    --gradient-orange: linear-gradient(135deg, hsl(195 100% 60%), hsl(220 100% 55%));
+    --shadow-orange: 0 14px 40px -14px hsl(210 100% 56% / 0.55);
 
     /* legacy aliases used elsewhere in app */
-    --gold: 22 100% 55%;
-    --gold-bright: 28 100% 60%;
+    --gold: 210 100% 60%;
+    --gold-bright: 195 100% 60%;
     --gradient-gold: var(--gradient-orange);
     --shadow-gold: var(--shadow-orange);
     --shadow-deep: 0 24px 60px -20px hsl(0 0% 0% / 0.6);
 
     --sidebar-background: 0 0% 8%;
     --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 22 100% 55%;
+    --sidebar-primary: 210 100% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 14%;
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 22 100% 55%;
+    --sidebar-ring: 210 100% 56%;
   }
 }
 
