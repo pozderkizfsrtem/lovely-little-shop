@@ -53,17 +53,17 @@ const Index = () => {
             <Search className="w-4 h-4 text-muted-foreground" />
             <input
               type="search"
-              placeholder="Szukaj produktów..."
+              placeholder={t.searchPlaceholder}
               className="bg-transparent flex-1 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 text-sm hover:text-primary transition-colors outline-none" aria-label="Język">
+            <DropdownMenuTrigger className="flex items-center gap-1 text-sm hover:text-primary transition-colors outline-none" aria-label={t.language}>
               <Globe className="w-5 h-5" />
               <span className="font-semibold">{lang}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuLabel>Język / Language</DropdownMenuLabel>
+              <DropdownMenuLabel>{t.language}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {LANGUAGES.map((l) => (
                 <DropdownMenuItem
@@ -78,7 +78,7 @@ const Index = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link to="/zamowienie" className="relative" aria-label="Koszyk">
+          <Link to="/zamowienie" className="relative" aria-label={t.cart}>
             <ShoppingCart className="w-5 h-5" />
             {count > 0 && (
               <span className="absolute -top-1.5 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
@@ -87,15 +87,15 @@ const Index = () => {
             )}
           </Link>
           <Sheet>
-            <SheetTrigger aria-label="Menu" className="hover:text-primary transition-colors outline-none">
+            <SheetTrigger aria-label={t.menu} className="hover:text-primary transition-colors outline-none">
               <Menu className="w-5 h-5" />
             </SheetTrigger>
             <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-card border-border">
               <SheetHeader>
-                <SheetTitle className="text-left text-xl uppercase tracking-wide">Menu</SheetTitle>
+                <SheetTitle className="text-left text-xl uppercase tracking-wide">{t.menu}</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col">
-                {MENU_ITEMS.map((item) => (
+                {menuItems.map((item) => (
                   <SheetClose asChild key={item.to}>
                     <Link
                       to={item.to}
@@ -113,10 +113,10 @@ const Index = () => {
         {/* Filter bar */}
         <div className="max-w-3xl mx-auto px-4 pb-3 grid grid-cols-2 gap-3">
           <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            Sortowanie <ChevronDown className="w-4 h-4" />
+            {t.sort} <ChevronDown className="w-4 h-4" />
           </button>
           <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            Smart Cena <Info className="w-4 h-4 text-muted-foreground" />
+            {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       </div>
