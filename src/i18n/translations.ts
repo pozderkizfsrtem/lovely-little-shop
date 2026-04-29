@@ -1,6 +1,39 @@
 export type Lang = "PL" | "EN" | "UA";
 
-export const translations = {
+type Dict = {
+  searchPlaceholder: string;
+  cart: string;
+  menu: string;
+  language: string;
+  sort: string;
+  smartPrice: string;
+  choose: string;
+  order: string;
+  pcs: string;
+  perPiece: string;
+  currency: string;
+  yourCart: string;
+  fromQty: string;
+  pieces: string;
+  availableFlavors: string;
+  remove: string;
+  removeFlavor: string;
+  footer: string;
+  nav: {
+    shop: string;
+    about: string;
+    delivery: string;
+    payment: string;
+    returns: string;
+    promotions: string;
+    faq: string;
+    reviews: string;
+    contact: string;
+  };
+  flavors: Record<string, string>;
+};
+
+export const translations: Record<Lang, Dict> = {
   PL: {
     searchPlaceholder: "Szukaj produktów...",
     cart: "Koszyk",
