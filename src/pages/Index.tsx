@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
+import { useLang } from "@/i18n/LanguageContext";
 
 const LANGUAGES = [
   { code: "PL", label: "Polski", flag: "🇵🇱" },
@@ -27,26 +27,27 @@ const LANGUAGES = [
   { code: "UA", label: "Українська", flag: "🇺🇦" },
 ] as const;
 
-const MENU_ITEMS = [
-  { label: "Sklep", to: "/" },
-  { label: "O sklepie", to: "/o-sklepie" },
-  { label: "Dostawa", to: "/dostawa" },
-  { label: "Płatność", to: "/platnosc" },
-  { label: "Zwroty i wymiany", to: "/zwroty" },
-  { label: "Zasady promocji", to: "/promocje" },
-  { label: "Najczęstsze pytania", to: "/faq" },
-  { label: "Opinie klientów", to: "/opinie" },
-  { label: "Kontakt", to: "/kontakt" },
-];
-
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
-  const [lang, setLang] = useState<"PL" | "EN" | "UA">("PL");
+  const { lang, setLang, t, tFlavor } = useLang();
+
+  const menuItems = [
+    { label: t.nav.shop, to: "/" },
+    { label: t.nav.about, to: "/o-sklepie" },
+    { label: t.nav.delivery, to: "/dostawa" },
+    { label: t.nav.payment, to: "/platnosc" },
+    { label: t.nav.returns, to: "/zwroty" },
+    { label: t.nav.promotions, to: "/promocje" },
+    { label: t.nav.faq, to: "/faq" },
+    { label: t.nav.reviews, to: "/opinie" },
+    { label: t.nav.contact, to: "/kontakt" },
+  ];
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen text-foreground">
       {/* Top bar */}
-      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
+
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
           <div className="flex-1 flex items-center gap-2 bg-secondary rounded-lg px-3 py-2.5">
             <Search className="w-4 h-4 text-muted-foreground" />
