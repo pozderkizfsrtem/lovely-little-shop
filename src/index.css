@@ -15,7 +15,7 @@
     --popover: 0 0% 10%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 210 100% 56%;           /* blue CTA */
+    --primary: 205 100% 60%;           /* blue CTA */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 14%;
@@ -36,10 +36,10 @@
 
     --radius: 0.625rem;
 
-    --orange: 210 100% 60%;
-    --orange-bright: 195 100% 60%;
-    --gradient-orange: linear-gradient(135deg, hsl(195 100% 60%), hsl(220 100% 55%));
-    --shadow-orange: 0 14px 40px -14px hsl(210 100% 56% / 0.55);
+    --orange: 195 100% 65%;
+    --orange-bright: 185 100% 70%;
+    --gradient-orange: linear-gradient(135deg, hsl(185 100% 65%), hsl(215 100% 60%));
+    --shadow-orange: 0 18px 50px -12px hsl(200 100% 60% / 0.85);
 
     /* legacy aliases used elsewhere in app */
     --gold: 210 100% 60%;
@@ -86,9 +86,10 @@
 
   .card-glow {
     background: linear-gradient(180deg,
-      hsl(210 60% 12%) 0%,
-      hsl(0 0% 9%) 60%);
-    border: 1px solid hsl(0 0% 18%);
+      hsl(205 80% 18%) 0%,
+      hsl(220 50% 10%) 60%);
+    border: 1px solid hsl(205 70% 30%);
+    box-shadow: 0 0 0 1px hsl(200 100% 60% / 0.08), 0 20px 50px -20px hsl(210 100% 50% / 0.4);
   }
 
   .grain { position: relative; }
@@ -116,25 +117,25 @@
   .orb {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(80px);
-    opacity: 0.45;
+    filter: blur(70px);
+    opacity: 0.85;
     will-change: transform;
   }
   .orb-1 {
-    width: 480px; height: 480px;
-    background: radial-gradient(circle, hsl(210 100% 55% / 0.7), transparent 70%);
+    width: 520px; height: 520px;
+    background: radial-gradient(circle, hsl(205 100% 60% / 1), transparent 70%);
     top: -120px; left: -120px;
     animation: orb-drift-1 22s ease-in-out infinite;
   }
   .orb-2 {
-    width: 420px; height: 420px;
-    background: radial-gradient(circle, hsl(195 100% 60% / 0.55), transparent 70%);
+    width: 460px; height: 460px;
+    background: radial-gradient(circle, hsl(185 100% 65% / 0.9), transparent 70%);
     top: 30%; right: -140px;
     animation: orb-drift-2 26s ease-in-out infinite;
   }
   .orb-3 {
-    width: 520px; height: 520px;
-    background: radial-gradient(circle, hsl(225 90% 50% / 0.5), transparent 70%);
+    width: 560px; height: 560px;
+    background: radial-gradient(circle, hsl(225 100% 60% / 0.85), transparent 70%);
     bottom: -180px; left: 25%;
     animation: orb-drift-3 30s ease-in-out infinite;
   }
