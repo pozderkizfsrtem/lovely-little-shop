@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCart } from "@/context/useCart";
 import { findProduct } from "@/data/products";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getTelegramUser } from "@/lib/telegram";
+import { useLang } from "@/i18n/LanguageContext";
+import InpostGeowidget from "@/components/InpostGeowidget";
 
 const schema = z.object({
   firstName: z.string().trim().min(1, "Podaj imię").max(60),
@@ -25,7 +29,9 @@ const schema = z.object({
 
 const Checkout = () => {
   const { items, total, count, unitPriceOfProduct } = useCart();
+  const { lang } = useLang();
   const [submitting, setSubmitting] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
