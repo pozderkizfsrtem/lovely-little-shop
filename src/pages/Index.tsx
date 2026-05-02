@@ -141,12 +141,35 @@ const Index = () => {
 
         {/* Filter bar */}
         <div className="max-w-3xl mx-auto px-4 pb-3 grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            {t.sort} <ChevronDown className="w-4 h-4" />
-          </button>
-          <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
+              <span className="truncate">{currentSortLabel}</span>
+              <ChevronDown className="w-4 h-4 shrink-0" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>{t.sort}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {sortOptions.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.key}
+                  onClick={() => setSortKey(opt.key)}
+                  className="cursor-pointer flex items-center gap-2"
+                >
+                  <span className="flex-1">{opt.label}</span>
+                  {sortKey === opt.key && <Check className="w-4 h-4 text-primary" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Popover>
+            <PopoverTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
+              {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-72 text-sm leading-relaxed">
+              <p className="font-semibold mb-1.5 text-primary">{t.smartPrice}</p>
+              <p className="text-muted-foreground">{t.smartPriceInfo}</p>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
