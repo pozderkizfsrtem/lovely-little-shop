@@ -6,7 +6,12 @@ type Dict = {
   menu: string;
   language: string;
   sort: string;
+  sortNameAsc: string;
+  sortNameDesc: string;
+  sortPriceAsc: string;
+  sortPriceDesc: string;
   smartPrice: string;
+  smartPriceInfo: string;
   choose: string;
   order: string;
   pcs: string;
