@@ -12,6 +12,10 @@ type Dict = {
   sortPriceDesc: string;
   smartPrice: string;
   smartPriceInfo: string;
+  pickFromMap: string;
+  pickParcelLocker: string;
+  selectedLocker: string;
+  close: string;
   choose: string;
   order: string;
   pcs: string;
