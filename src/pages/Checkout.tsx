@@ -29,7 +29,7 @@ const schema = z.object({
 
 const Checkout = () => {
   const { items, total, count, unitPriceOfProduct } = useCart();
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const [submitting, setSubmitting] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const navigate = useNavigate();
