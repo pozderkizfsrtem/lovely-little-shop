@@ -34,6 +34,31 @@ const LANGUAGES = [
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
+  const [sortKey, setSortKey] = useState<SortKey>("name-asc");
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "name-asc", label: t.sortNameAsc },
+    { key: "name-desc", label: t.sortNameDesc },
+    { key: "price-asc", label: t.sortPriceAsc },
+    { key: "price-desc", label: t.sortPriceDesc },
+  ];
+
+  const sortedProducts = useMemo(() => {
+    const arr = [...products];
+    const priceOf = (p: typeof products[number]) => (p.tiers ? p.tiers[0].price : p.price);
+    switch (sortKey) {
+      case "name-asc":
+        return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case "name-desc":
+        return arr.sort((a, b) => b.name.localeCompare(a.name));
+      case "price-asc":
+        return arr.sort((a, b) => priceOf(a) - priceOf(b));
+      case "price-desc":
+        return arr.sort((a, b) => priceOf(b) - priceOf(a));
+    }
+  }, [sortKey]);
+
+  const currentSortLabel = sortOptions.find((o) => o.key === sortKey)?.label ?? t.sort;
 
   const menuItems = [
     { label: t.nav.shop, to: "/" },
