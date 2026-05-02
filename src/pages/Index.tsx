@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
@@ -17,9 +18,12 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 import { useLang } from "@/i18n/LanguageContext";
+
+type SortKey = "name-asc" | "name-desc" | "price-asc" | "price-desc";
 
 const LANGUAGES = [
   { code: "PL", label: "Polski", flag: "🇵🇱" },
