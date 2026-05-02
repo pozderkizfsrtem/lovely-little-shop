@@ -6,7 +6,12 @@ type Dict = {
   menu: string;
   language: string;
   sort: string;
+  sortNameAsc: string;
+  sortNameDesc: string;
+  sortPriceAsc: string;
+  sortPriceDesc: string;
   smartPrice: string;
+  smartPriceInfo: string;
   choose: string;
   order: string;
   pcs: string;
@@ -40,7 +45,12 @@ export const translations: Record<Lang, Dict> = {
     menu: "Menu",
     language: "Język",
     sort: "Sortowanie",
+    sortNameAsc: "Nazwa: A → Z",
+    sortNameDesc: "Nazwa: Z → A",
+    sortPriceAsc: "Cena: rosnąco",
+    sortPriceDesc: "Cena: malejąco",
     smartPrice: "Smart Cena",
+    smartPriceInfo: "Smart Cena to automatyczna zniżka ilościowa — im więcej sztuk zamówisz, tym niższa cena za sztukę. Progi rabatowe są widoczne na karcie produktu.",
     choose: "Wybierz",
     order: "Zamów",
     pcs: "szt.",
@@ -88,6 +98,11 @@ export const translations: Record<Lang, Dict> = {
     menu: "Menu",
     language: "Language",
     sort: "Sort",
+    sortNameAsc: "Name: A → Z",
+    sortNameDesc: "Name: Z → A",
+    sortPriceAsc: "Price: low to high",
+    sortPriceDesc: "Price: high to low",
+    smartPriceInfo: "Smart Price is an automatic volume discount — the more units you order, the lower the price per piece. Discount tiers are shown on each product card.",
     smartPrice: "Smart Price",
     choose: "Choose",
     order: "Order",
@@ -136,6 +151,11 @@ export const translations: Record<Lang, Dict> = {
     menu: "Меню",
     language: "Мова",
     sort: "Сортування",
+    sortNameAsc: "Назва: А → Я",
+    sortNameDesc: "Назва: Я → А",
+    sortPriceAsc: "Ціна: за зростанням",
+    sortPriceDesc: "Ціна: за спаданням",
+    smartPriceInfo: "Smart Ціна — це автоматична знижка за кількість: чим більше штук ви замовляєте, тим нижча ціна за штуку. Пороги знижок показані на картці товару.",
     smartPrice: "Smart Ціна",
     choose: "Обрати",
     order: "Замовити",

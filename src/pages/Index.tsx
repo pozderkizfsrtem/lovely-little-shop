@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
@@ -17,9 +18,12 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 import { useLang } from "@/i18n/LanguageContext";
+
+type SortKey = "name-asc" | "name-desc" | "price-asc" | "price-desc";
 
 const LANGUAGES = [
   { code: "PL", label: "Polski", flag: "🇵🇱" },
@@ -30,6 +34,31 @@ const LANGUAGES = [
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
+  const [sortKey, setSortKey] = useState<SortKey>("name-asc");
+
+  const sortOptions: { key: SortKey; label: string }[] = [
+    { key: "name-asc", label: t.sortNameAsc },
+    { key: "name-desc", label: t.sortNameDesc },
+    { key: "price-asc", label: t.sortPriceAsc },
+    { key: "price-desc", label: t.sortPriceDesc },
+  ];
+
+  const sortedProducts = useMemo(() => {
+    const arr = [...products];
+    const priceOf = (p: typeof products[number]) => (p.tiers ? p.tiers[0].price : p.price);
+    switch (sortKey) {
+      case "name-asc":
+        return arr.sort((a, b) => a.name.localeCompare(b.name));
+      case "name-desc":
+        return arr.sort((a, b) => b.name.localeCompare(a.name));
+      case "price-asc":
+        return arr.sort((a, b) => priceOf(a) - priceOf(b));
+      case "price-desc":
+        return arr.sort((a, b) => priceOf(b) - priceOf(a));
+    }
+  }, [sortKey]);
+
+  const currentSortLabel = sortOptions.find((o) => o.key === sortKey)?.label ?? t.sort;
 
   const menuItems = [
     { label: t.nav.shop, to: "/" },
@@ -112,19 +141,42 @@ const Index = () => {
 
         {/* Filter bar */}
         <div className="max-w-3xl mx-auto px-4 pb-3 grid grid-cols-2 gap-3">
-          <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            {t.sort} <ChevronDown className="w-4 h-4" />
-          </button>
-          <button className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm">
-            {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
+              <span className="truncate">{currentSortLabel}</span>
+              <ChevronDown className="w-4 h-4 shrink-0" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuLabel>{t.sort}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {sortOptions.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.key}
+                  onClick={() => setSortKey(opt.key)}
+                  className="cursor-pointer flex items-center gap-2"
+                >
+                  <span className="flex-1">{opt.label}</span>
+                  {sortKey === opt.key && <Check className="w-4 h-4 text-primary" />}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Popover>
+            <PopoverTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
+              {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-72 text-sm leading-relaxed">
+              <p className="font-semibold mb-1.5 text-primary">{t.smartPrice}</p>
+              <p className="text-muted-foreground">{t.smartPriceInfo}</p>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
       {/* Products grid */}
       <div className="max-w-3xl mx-auto px-4 py-4">
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {products.map((p, idx) => {
+          {sortedProducts.map((p, idx) => {
             const basePrice = p.tiers ? p.tiers[0].price : p.price;
             return (
               <article
