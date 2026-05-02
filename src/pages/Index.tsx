@@ -176,7 +176,7 @@ const Index = () => {
       {/* Products grid */}
       <div className="max-w-3xl mx-auto px-4 py-4">
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {products.map((p, idx) => {
+          {sortedProducts.map((p, idx) => {
             const basePrice = p.tiers ? p.tiers[0].price : p.price;
             return (
               <article
