@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCart } from "@/context/useCart";
 import { findProduct } from "@/data/products";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getTelegramUser } from "@/lib/telegram";
+import { useLang } from "@/i18n/LanguageContext";
+import InpostGeowidget from "@/components/InpostGeowidget";
 
 const schema = z.object({
   firstName: z.string().trim().min(1, "Podaj imię").max(60),
@@ -25,7 +29,9 @@ const schema = z.object({
 
 const Checkout = () => {
   const { items, total, count, unitPriceOfProduct } = useCart();
+  const { lang, t } = useLang();
   const [submitting, setSubmitting] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
@@ -155,13 +161,24 @@ const Checkout = () => {
           </div>
           <div>
             <Label htmlFor="paczkomat">Adres paczkomatu</Label>
-            <Input
-              id="paczkomat"
-              placeholder="np. WAW123M, ul. Przykładowa 1"
-              value={form.paczkomat}
-              onChange={set("paczkomat")}
-              className="mt-1.5"
-            />
+            <div className="mt-1.5 flex gap-2">
+              <Input
+                id="paczkomat"
+                placeholder="np. WAW123M, ul. Przykładowa 1"
+                value={form.paczkomat}
+                onChange={set("paczkomat")}
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setMapOpen(true)}
+                className="rounded-md whitespace-nowrap"
+              >
+                <MapPin className="h-4 w-4 mr-1.5" />
+                {useLang().t.pickFromMap}
+              </Button>
+            </div>
             {errors.paczkomat && <p className="text-xs text-destructive mt-1">{errors.paczkomat}</p>}
           </div>
 
@@ -179,6 +196,23 @@ const Checkout = () => {
           </div>
         </form>
       </div>
+
+      <Dialog open={mapOpen} onOpenChange={setMapOpen}>
+        <DialogContent className="max-w-4xl w-[95vw] h-[85vh] p-0 overflow-hidden flex flex-col">
+          <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/50">
+            <DialogTitle>{useLang().t.pickParcelLocker}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0">
+            <InpostGeowidget
+              language={lang === "UA" ? "uk" : lang === "EN" ? "en" : "pl"}
+              onSelect={(label) => {
+                setForm((p) => ({ ...p, paczkomat: label }));
+                setMapOpen(false);
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };

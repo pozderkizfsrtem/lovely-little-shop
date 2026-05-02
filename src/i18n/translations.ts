@@ -12,6 +12,10 @@ type Dict = {
   sortPriceDesc: string;
   smartPrice: string;
   smartPriceInfo: string;
+  pickFromMap: string;
+  pickParcelLocker: string;
+  selectedLocker: string;
+  close: string;
   choose: string;
   order: string;
   pcs: string;
@@ -51,6 +55,10 @@ export const translations: Record<Lang, Dict> = {
     sortPriceDesc: "Cena: malejąco",
     smartPrice: "Smart Cena",
     smartPriceInfo: "Smart Cena to automatyczna zniżka ilościowa — im więcej sztuk zamówisz, tym niższa cena za sztukę. Progi rabatowe są widoczne na karcie produktu.",
+    pickFromMap: "Wybierz z mapy",
+    pickParcelLocker: "Wybierz paczkomat InPost",
+    selectedLocker: "Wybrany paczkomat",
+    close: "Zamknij",
     choose: "Wybierz",
     order: "Zamów",
     pcs: "szt.",
@@ -103,6 +111,10 @@ export const translations: Record<Lang, Dict> = {
     sortPriceAsc: "Price: low to high",
     sortPriceDesc: "Price: high to low",
     smartPriceInfo: "Smart Price is an automatic volume discount — the more units you order, the lower the price per piece. Discount tiers are shown on each product card.",
+    pickFromMap: "Pick from map",
+    pickParcelLocker: "Choose InPost parcel locker",
+    selectedLocker: "Selected locker",
+    close: "Close",
     smartPrice: "Smart Price",
     choose: "Choose",
     order: "Order",
@@ -156,6 +168,10 @@ export const translations: Record<Lang, Dict> = {
     sortPriceAsc: "Ціна: за зростанням",
     sortPriceDesc: "Ціна: за спаданням",
     smartPriceInfo: "Smart Ціна — це автоматична знижка за кількість: чим більше штук ви замовляєте, тим нижча ціна за штуку. Пороги знижок показані на картці товару.",
+    pickFromMap: "Обрати на мапі",
+    pickParcelLocker: "Оберіть поштомат InPost",
+    selectedLocker: "Обраний поштомат",
+    close: "Закрити",
     smartPrice: "Smart Ціна",
     choose: "Обрати",
     order: "Замовити",
