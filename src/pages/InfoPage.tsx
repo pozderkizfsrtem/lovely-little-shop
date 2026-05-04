@@ -18,7 +18,7 @@ const InfoPage = ({ eyebrow, title, children }: Props) => {
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
       >
         <ArrowLeft className="w-4 h-4" />
-        {t.backToShop ?? "← Wróć do sklepu"}
+        {t.backToShop}
       </Link>
       <p className="text-primary text-xs uppercase tracking-[0.3em] mb-4">— {eyebrow}</p>
       <h1 className="font-display text-5xl md:text-6xl leading-tight mb-10">{title}</h1>
@@ -31,7 +31,7 @@ const InfoPage = ({ eyebrow, title, children }: Props) => {
           className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
         >
           <ArrowLeft className="w-4 h-4" />
-          {t.backToShop ?? "Wróć do sklepu"}
+          {t.backToShop}
         </Link>
       </div>
     </div>

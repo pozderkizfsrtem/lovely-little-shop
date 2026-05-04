@@ -72,6 +72,7 @@ export const translations: Record<Lang, Dict> = {
     remove: "Usuń",
     removeFlavor: "Usuń smak",
     footer: "© 2026 PuffBot — hello@maison.com",
+    backToShop: "Wróć do sklepu",
     nav: {
       shop: "Sklep",
       about: "O sklepie",
@@ -129,6 +130,7 @@ export const translations: Record<Lang, Dict> = {
     remove: "Remove",
     removeFlavor: "Remove flavor",
     footer: "© 2026 PuffBot — hello@maison.com",
+    backToShop: "Back to shop",
     nav: {
       shop: "Shop",
       about: "About",
@@ -186,6 +188,7 @@ export const translations: Record<Lang, Dict> = {
     remove: "Видалити",
     removeFlavor: "Видалити смак",
     footer: "© 2026 PuffBot — hello@maison.com",
+    backToShop: "Повернутися до магазину",
     nav: {
       shop: "Магазин",
       about: "Про магазин",
