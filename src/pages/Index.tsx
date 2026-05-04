@@ -74,6 +74,29 @@ const Index = () => {
 
   return (
     <main className="min-h-screen text-foreground">
+      {/* Brand header */}
+      <header className="relative max-w-3xl mx-auto px-4 pt-8 pb-4 text-center">
+        <h1
+          className="font-display font-extrabold tracking-tight text-5xl sm:text-6xl md:text-7xl uppercase bg-clip-text text-transparent inline-block"
+          style={{
+            backgroundImage:
+              "linear-gradient(135deg, hsl(185 100% 70%), hsl(205 100% 60%) 45%, hsl(225 100% 65%))",
+            filter: "drop-shadow(0 6px 24px hsl(205 100% 55% / 0.55))",
+            letterSpacing: "-0.04em",
+          }}
+        >
+          PuffBot
+        </h1>
+        <span
+          aria-hidden
+          className="block mx-auto mt-2 h-1 w-24 rounded-full"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(195 100% 65%), transparent)",
+          }}
+        />
+      </header>
+
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
 
