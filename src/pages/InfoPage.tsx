@@ -25,15 +25,6 @@ const InfoPage = ({ eyebrow, title, children }: Props) => {
       <div className="prose prose-invert max-w-none text-muted-foreground leading-relaxed space-y-4 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:text-foreground [&_h2]:mt-8 [&_h2]:mb-2 [&_strong]:text-foreground">
         {children}
       </div>
-      <div className="mt-12 pt-6 border-t border-border/50">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          {t.backToShop}
-        </Link>
-      </div>
     </div>
   );
 };
