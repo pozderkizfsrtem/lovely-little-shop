@@ -48,13 +48,13 @@
     --shadow-gold: var(--shadow-orange);
     --shadow-deep: 0 24px 60px -20px hsl(0 0% 0% / 0.6);
 
-    --sidebar-background: 0 0% 8%;
+    --sidebar-background: 220 50% 7%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 210 100% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent: 218 45% 14%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 18%;
+    --sidebar-border: 218 40% 20%;
     --sidebar-ring: 210 100% 56%;
   }
 }
