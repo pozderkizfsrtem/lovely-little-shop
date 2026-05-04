@@ -28,6 +28,7 @@ type Dict = {
   remove: string;
   removeFlavor: string;
   footer: string;
+  backToShop: string;
   nav: {
     shop: string;
     about: string;
