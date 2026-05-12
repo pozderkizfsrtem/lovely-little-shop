@@ -82,26 +82,32 @@ Deno.serve(async (req) => {
       `<b>Produkty:</b>\n${itemsText}\n\n` +
       `<b>Razem: ${payload.total} zł</b>`;
 
-    // Wyślij na chat z klientem (gdy znamy jego Telegram ID), w przeciwnym razie fallback
-    const targetChatId = payload.telegramUserId ?? TELEGRAM_CHAT_ID;
+    const sendTo = async (chatId: string | number) => {
+      const r = await fetch(`${GATEWAY_URL}/sendMessage`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": TELEGRAM_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+      });
+      const d = await r.json();
+      return { ok: r.ok, status: r.status, data: d };
+    };
 
-    const tgRes = await fetch(`${GATEWAY_URL}/sendMessage`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": TELEGRAM_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: targetChatId,
-        text,
-        parse_mode: "HTML",
-      }),
-    });
+    // Zawsze wyślij na chat właściciela (bot)
+    const ownerRes = await sendTo(TELEGRAM_CHAT_ID);
+    if (!ownerRes.ok) {
+      throw new Error(`Telegram API failed [${ownerRes.status}]: ${JSON.stringify(ownerRes.data)}`);
+    }
 
-    const data = await tgRes.json();
-    if (!tgRes.ok) {
-      throw new Error(`Telegram API failed [${tgRes.status}]: ${JSON.stringify(data)}`);
+    // Dodatkowo wyślij na chat klienta, jeżeli mamy jego Telegram ID
+    if (payload.telegramUserId) {
+      const clientRes = await sendTo(payload.telegramUserId);
+      if (!clientRes.ok) {
+        console.error("Client send failed:", clientRes.status, clientRes.data);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
