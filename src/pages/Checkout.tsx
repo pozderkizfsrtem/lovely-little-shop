@@ -73,8 +73,15 @@ const Checkout = () => {
         const p = findProduct(i.productId);
         return { product: p?.name ?? i.productId, flavor: i.flavor, qty: i.qty };
       });
+      const tgUser = getTelegramUser();
       const { data, error } = await supabase.functions.invoke("send-order", {
-        body: { ...res.data, items: orderItems, total },
+        body: {
+          ...res.data,
+          items: orderItems,
+          total,
+          telegramUserId: tgUser?.id ?? null,
+          telegramUsername: tgUser?.username ?? null,
+        },
       });
       if (error || !data?.success) {
         throw new Error(error?.message || data?.error || "Błąd wysyłki");
