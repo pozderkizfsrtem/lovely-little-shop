@@ -16,6 +16,8 @@ interface OrderPayload {
   paczkomat: string;
   items: OrderItem[];
   total: number;
+  telegramUserId?: number | null;
+  telegramUsername?: string | null;
 }
 
 const isValid = (p: unknown): p is OrderPayload => {
@@ -28,7 +30,9 @@ const isValid = (p: unknown): p is OrderPayload => {
     typeof o.phone === "string" && o.phone.length > 0 && o.phone.length <= 20 &&
     typeof o.paczkomat === "string" && o.paczkomat.length > 0 && o.paczkomat.length <= 120 &&
     Array.isArray(o.items) && o.items.length > 0 && o.items.length <= 50 &&
-    typeof o.total === "number" && o.total >= 0
+    typeof o.total === "number" && o.total >= 0 &&
+    (o.telegramUserId === undefined || o.telegramUserId === null || typeof o.telegramUserId === "number") &&
+    (o.telegramUsername === undefined || o.telegramUsername === null || typeof o.telegramUsername === "string")
   );
 };
 
@@ -64,14 +68,22 @@ Deno.serve(async (req) => {
       )
       .join("\n");
 
+    const usernameLine = payload.telegramUsername
+      ? `<b>Telegram:</b> @${escapeHtml(payload.telegramUsername)}\n`
+      : "";
+
     const text =
       `🛒 <b>Nowe zamówienie</b>\n\n` +
       `<b>Klient:</b> ${escapeHtml(payload.firstName)} ${escapeHtml(payload.lastName)}\n` +
+      usernameLine +
       `<b>Email:</b> ${escapeHtml(payload.email)}\n` +
       `<b>Telefon:</b> ${escapeHtml(payload.phone)}\n` +
       `<b>Paczkomat:</b> ${escapeHtml(payload.paczkomat)}\n\n` +
       `<b>Produkty:</b>\n${itemsText}\n\n` +
       `<b>Razem: ${payload.total} zł</b>`;
+
+    // Wyślij na chat z klientem (gdy znamy jego Telegram ID), w przeciwnym razie fallback
+    const targetChatId = payload.telegramUserId ?? TELEGRAM_CHAT_ID;
 
     const tgRes = await fetch(`${GATEWAY_URL}/sendMessage`, {
       method: "POST",
@@ -81,7 +93,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
+        chat_id: targetChatId,
         text,
         parse_mode: "HTML",
       }),
