@@ -61,26 +61,41 @@ Deno.serve(async (req) => {
       });
     }
 
+    const totalQty = payload.items.reduce((s, i) => s + i.qty, 0);
     const itemsText = payload.items
       .map(
-        (i) =>
-          `• ${escapeHtml(i.product)} — ${escapeHtml(i.flavor)} ×${i.qty}`,
+        (i, idx) =>
+          `  ${idx + 1}. <b>${escapeHtml(i.product)}</b>\n` +
+          `     • Smak: ${escapeHtml(i.flavor)}\n` +
+          `     • Ilość: <b>${i.qty} szt.</b>`,
       )
       .join("\n");
 
+    const orderId = `#${Date.now().toString(36).toUpperCase()}`;
+    const now = new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" });
+
     const usernameLine = payload.telegramUsername
-      ? `<b>Telegram:</b> @${escapeHtml(payload.telegramUsername)}\n`
+      ? `┃ <b>Telegram:</b> <a href="https://t.me/${escapeHtml(payload.telegramUsername)}">@${escapeHtml(payload.telegramUsername)}</a>\n`
       : "";
 
     const text =
-      `🛒 <b>Nowe zamówienie</b>\n\n` +
-      `<b>Klient:</b> ${escapeHtml(payload.firstName)} ${escapeHtml(payload.lastName)}\n` +
+      `🛒 <b>NOWE ZAMÓWIENIE</b> ${orderId}\n` +
+      `🕒 ${escapeHtml(now)}\n` +
+      `━━━━━━━━━━━━━━━━━━\n\n` +
+      `📊 <b>STATUS</b>\n` +
+      `┃ 🟡 <b>Nowe — oczekuje na realizację</b>\n\n` +
+      `👤 <b>KLIENT</b>\n` +
+      `┃ <b>Imię i nazwisko:</b> ${escapeHtml(payload.firstName)} ${escapeHtml(payload.lastName)}\n` +
       usernameLine +
-      `<b>Email:</b> ${escapeHtml(payload.email)}\n` +
-      `<b>Telefon:</b> ${escapeHtml(payload.phone)}\n` +
-      `<b>Paczkomat:</b> ${escapeHtml(payload.paczkomat)}\n\n` +
-      `<b>Produkty:</b>\n${itemsText}\n\n` +
-      `<b>Razem: ${payload.total} zł</b>`;
+      `┃ <b>Email:</b> ${escapeHtml(payload.email)}\n` +
+      `┃ <b>Telefon:</b> ${escapeHtml(payload.phone)}\n\n` +
+      `📦 <b>DOSTAWA</b>\n` +
+      `┃ InPost Paczkomat\n` +
+      `┃ ${escapeHtml(payload.paczkomat)}\n\n` +
+      `🛍️ <b>PRODUKTY</b> (${totalQty} szt.)\n` +
+      `${itemsText}\n\n` +
+      `━━━━━━━━━━━━━━━━━━\n` +
+      `💰 <b>RAZEM: ${payload.total} zł</b>`;
 
     const sendTo = async (chatId: string | number) => {
       const r = await fetch(`${GATEWAY_URL}/sendMessage`, {
