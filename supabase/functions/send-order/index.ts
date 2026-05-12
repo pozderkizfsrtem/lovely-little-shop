@@ -96,18 +96,9 @@ Deno.serve(async (req) => {
       return { ok: r.ok, status: r.status, data: d };
     };
 
-    // Zawsze wyślij na chat właściciela (bot)
     const ownerRes = await sendTo(TELEGRAM_CHAT_ID);
     if (!ownerRes.ok) {
       throw new Error(`Telegram API failed [${ownerRes.status}]: ${JSON.stringify(ownerRes.data)}`);
-    }
-
-    // Dodatkowo wyślij na chat klienta, jeżeli mamy jego Telegram ID
-    if (payload.telegramUserId) {
-      const clientRes = await sendTo(payload.telegramUserId);
-      if (!clientRes.ok) {
-        console.error("Client send failed:", clientRes.status, clientRes.data);
-      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
