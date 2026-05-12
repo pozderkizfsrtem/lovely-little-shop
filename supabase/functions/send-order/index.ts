@@ -16,6 +16,8 @@ interface OrderPayload {
   paczkomat: string;
   items: OrderItem[];
   total: number;
+  telegramUserId?: number | null;
+  telegramUsername?: string | null;
 }
 
 const isValid = (p: unknown): p is OrderPayload => {
@@ -28,7 +30,9 @@ const isValid = (p: unknown): p is OrderPayload => {
     typeof o.phone === "string" && o.phone.length > 0 && o.phone.length <= 20 &&
     typeof o.paczkomat === "string" && o.paczkomat.length > 0 && o.paczkomat.length <= 120 &&
     Array.isArray(o.items) && o.items.length > 0 && o.items.length <= 50 &&
-    typeof o.total === "number" && o.total >= 0
+    typeof o.total === "number" && o.total >= 0 &&
+    (o.telegramUserId === undefined || o.telegramUserId === null || typeof o.telegramUserId === "number") &&
+    (o.telegramUsername === undefined || o.telegramUsername === null || typeof o.telegramUsername === "string")
   );
 };
 
