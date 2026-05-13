@@ -28,7 +28,7 @@ const schema = z.object({
 });
 
 const Checkout = () => {
-  const { items, total, count, unitPriceOfProduct } = useCart();
+  const { items, total, count, unitPriceOfProduct, clear } = useCart();
   const { lang, t } = useLang();
   const [submitting, setSubmitting] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -87,6 +87,7 @@ const Checkout = () => {
         throw new Error(error?.message || data?.error || "Błąd wysyłki");
       }
       toast.success("Menadżer niedługo się z Tobą skontaktuje");
+      clear();
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Nieznany błąd";

@@ -7,6 +7,7 @@ export type CartContextValue = {
   add: (productId: string, flavor: string) => void;
   sub: (productId: string, flavor: string) => void;
   removeFlavor: (productId: string, flavor: string) => void;
+  clear: () => void;
   qtyOfProduct: (productId: string) => number;
   unitPriceOfProduct: (productId: string) => number;
   count: number;

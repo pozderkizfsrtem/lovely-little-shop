@@ -28,6 +28,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const removeFlavor = (productId: string, flavor: string) =>
     setItems((prev) => prev.filter((i) => !(i.productId === productId && i.flavor === flavor)));
 
+  const clear = () => setItems([]);
+
   const value = useMemo(() => {
     const qtyOfProduct = (productId: string) =>
       items.filter((i) => i.productId === productId).reduce((s, i) => s + i.qty, 0);
@@ -44,7 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       0,
     );
 
-    return { items, add, sub, removeFlavor, count, total, qtyOfProduct, unitPriceOfProduct };
+    return { items, add, sub, removeFlavor, clear, count, total, qtyOfProduct, unitPriceOfProduct };
   }, [items]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
