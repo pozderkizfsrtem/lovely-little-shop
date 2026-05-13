@@ -86,7 +86,7 @@ const Checkout = () => {
       if (error || !data?.success) {
         throw new Error(error?.message || data?.error || "Błąd wysyłki");
       }
-      toast.success("Zamówienie złożone — dziękujemy!");
+      toast.success("Menadżer niedługo się z Tobą skontaktuje");
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Nieznany błąd";
