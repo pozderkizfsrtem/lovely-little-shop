@@ -1,13 +1,11 @@
 import InfoPage from "./InfoPage";
 
 const Promotions = () => (
-  <InfoPage eyebrow="Promocje" title="Zasady promocji">
-    <h2>Łączenie promocji</h2>
-    <p>Promocje i kody rabatowe nie łączą się ze sobą — przy zakupie wybierasz jedną korzyść.</p>
-    <h2>Kody rabatowe</h2>
-    <p>Kod rabatowy wpisujesz w koszyku przed finalizacją zamówienia. Każdy kod ma określony termin ważności.</p>
-    <h2>Newsletter</h2>
-    <p>Zapisując się do newslettera, otrzymujesz <strong>−10%</strong> na pierwsze zamówienie.</p>
+  <InfoPage eyebrow="Informacje" title="Zasady promocji">
+    <p>Promocje obowiązują przez ograniczony czas lub do wyczerpania zapasów.</p>
+    <p>Zniżki nie sumują się, chyba że warunki promocji mówią inaczej.</p>
+    <p>Niektóre akcje wymagają kodu rabatowego lub minimalnej wartości zamówienia.</p>
+    <p>Śledź nasze aktualizacje — regularnie przygotowujemy nowe oferty.</p>
   </InfoPage>
 );
 
