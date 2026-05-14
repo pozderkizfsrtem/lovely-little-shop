@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Point = {
   name: string;
@@ -18,11 +18,12 @@ type Props = {
 
 const SCRIPT_ID = "inpost-geowidget-script";
 const STYLE_ID = "inpost-geowidget-style";
-const SCRIPT_SRC = "https://geowidget.inpost.pl/inpost-geowidget.js";
-const STYLE_HREF = "https://geowidget.inpost.pl/inpost-geowidget.css";
-// Public sandbox token from InPost documentation
+// Official InPost Geowidget v5 production CDN
+const SCRIPT_SRC = "https://geowidget.easypack24.net/inpost-geowidget.js";
+const STYLE_HREF = "https://geowidget.easypack24.net/inpost-geowidget.css";
+// Public production token from InPost Geowidget v5 documentation
 const PUBLIC_TOKEN =
-  "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjEifQ.eyJqdGkiOiI2ODY1OWY0Ny01NTBlLTQyMmYtYTRlMi05Y2NjMTg4ZjBkOWMiLCJpYXQiOjE3MDU2NjU2OTUsInVzZXIiOnsiZW1haWwiOiJzYW5kYm94QGV4YW1wbGUuY29tIn19.";
+  "eyJhbGciOiJIUzI1NiJ9.eyJjbGllbnRfaWQiOiI1Njg5MmQ3OS05N2MwLTRkMDEtYjkzNi05N2Q1OTJjODI4ODYiLCJ1c2VyX2lkIjoiNTY4OTJkNzktOTdjMC00ZDAxLWI5MzYtOTdkNTkyYzgyODg2IiwiYXVkIjoiaHR0cHM6Ly9zYW5kYm94LWFwaS5zaGlweC1wbC5jb20iLCJpc3MiOiJzaGlweCIsImlhdCI6MTUxNjIzOTAyMn0._IiQX0J_2lZ8WwCEAkqJ8pXfgyfX3VZwKqXkQBxwI4U";
 
 const ensureAssets = () =>
   new Promise<void>((resolve, reject) => {
@@ -73,13 +74,33 @@ const InpostGeowidget = ({ onSelect, language = "pl" }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
     let cancelled = false;
-    // Register global callback referenced by the widget's onpoint attr
+    setStatus("loading");
+
+    // Global callback for the widget's `onpoint` attribute
     const cbName = `__inpostOnPoint_${Math.random().toString(36).slice(2)}`;
     (window as unknown as Record<string, unknown>)[cbName] = (point: Point) => {
       if (point) onSelectRef.current(formatPoint(point));
+    };
+
+    let widgetEl: HTMLElement | null = null;
+    const eventHandler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as
+        | Point
+        | { target?: { point?: Point } }
+        | undefined;
+      if (!detail) return;
+      // Some widget versions emit { target: { point } } shape
+      const point: Point | undefined =
+        (detail as { target?: { point?: Point } })?.target?.point ??
+        (detail as Point);
+      if (point && (point.name || point.address)) {
+        onSelectRef.current(formatPoint(point));
+      }
     };
 
     ensureAssets()
@@ -95,27 +116,54 @@ const InpostGeowidget = ({ onSelect, language = "pl" }: Props) => {
         widget.style.height = "100%";
         widget.style.display = "block";
         containerRef.current.appendChild(widget);
+        widgetEl = widget;
 
-        // Fallback: also listen for the onpointselect event
-        const handler = (e: Event) => {
-          const detail = (e as CustomEvent).detail as Point | undefined;
-          if (detail) onSelectRef.current(formatPoint(detail));
-        };
-        widget.addEventListener("onpointselect", handler);
+        // Listen on multiple possible event names used across versions
+        widget.addEventListener("onpoint", eventHandler as EventListener);
+        widget.addEventListener("onpointselect", eventHandler as EventListener);
+        widget.addEventListener("point.select", eventHandler as EventListener);
+        setStatus("ready");
       })
-      .catch((err) => {
-        if (containerRef.current) {
-          containerRef.current.innerHTML = `<div style="padding:1rem;color:#fff">${err.message}</div>`;
-        }
+      .catch((err: Error) => {
+        if (cancelled) return;
+        setStatus("error");
+        setErrorMsg(err.message || "Nie udało się załadować mapy");
       });
 
     return () => {
       cancelled = true;
+      if (widgetEl) {
+        widgetEl.removeEventListener("onpoint", eventHandler as EventListener);
+        widgetEl.removeEventListener("onpointselect", eventHandler as EventListener);
+        widgetEl.removeEventListener("point.select", eventHandler as EventListener);
+      }
       delete (window as unknown as Record<string, unknown>)[cbName];
     };
   }, [language]);
 
-  return <div ref={containerRef} className="w-full h-full min-h-[500px]" />;
+  return (
+    <div className="relative w-full h-full min-h-[500px]">
+      <div ref={containerRef} className="w-full h-full" />
+      {status === "loading" && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm pointer-events-none">
+          <div className="flex flex-col items-center gap-3 text-muted-foreground">
+            <div className="h-8 w-8 rounded-full border-2 border-gold border-t-transparent animate-spin" />
+            <p className="text-sm">Ładowanie mapy paczkomatów…</p>
+          </div>
+        </div>
+      )}
+      {status === "error" && (
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="text-center max-w-sm">
+            <p className="text-sm text-destructive mb-2">{errorMsg}</p>
+            <p className="text-xs text-muted-foreground">
+              Sprawdź połączenie z internetem lub wpisz adres paczkomatu ręcznie.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default InpostGeowidget;
