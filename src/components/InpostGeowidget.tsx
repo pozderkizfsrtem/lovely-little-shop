@@ -18,10 +18,10 @@ type Props = {
 
 const SCRIPT_ID = "inpost-geowidget-script";
 const STYLE_ID = "inpost-geowidget-style";
-// Official InPost Geowidget v5 production CDN
-const SCRIPT_SRC = "https://geowidget.easypack24.net/inpost-geowidget.js";
-const STYLE_HREF = "https://geowidget.easypack24.net/inpost-geowidget.css";
-// Public production token from InPost Geowidget v5 documentation
+// InPost Geowidget v5 sandbox CDN — accepts the public sandbox token on any domain
+const SCRIPT_SRC = "https://sandbox-easy-geowidget-sdk.easypack24.net/inpost-geowidget.js";
+const STYLE_HREF = "https://sandbox-easy-geowidget-sdk.easypack24.net/inpost-geowidget.css";
+// Public sandbox token from InPost Geowidget documentation (no domain whitelist required)
 const PUBLIC_TOKEN =
   "eyJhbGciOiJIUzI1NiJ9.eyJjbGllbnRfaWQiOiI1Njg5MmQ3OS05N2MwLTRkMDEtYjkzNi05N2Q1OTJjODI4ODYiLCJ1c2VyX2lkIjoiNTY4OTJkNzktOTdjMC00ZDAxLWI5MzYtOTdkNTkyYzgyODg2IiwiYXVkIjoiaHR0cHM6Ly9zYW5kYm94LWFwaS5zaGlweC1wbC5jb20iLCJpc3MiOiJzaGlweCIsImlhdCI6MTUxNjIzOTAyMn0._IiQX0J_2lZ8WwCEAkqJ8pXfgyfX3VZwKqXkQBxwI4U";
 
