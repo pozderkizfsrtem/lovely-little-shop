@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, X, Search, Globe, ShoppingCart, Menu, ChevronDown, Info, Check } from "lucide-react";
+import { Plus, Minus, X, Globe, ShoppingCart, Menu, Info, Check } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,42 +22,19 @@ import { products, findProduct } from "@/data/products";
 import { useCart } from "@/context/useCart";
 import { useLang } from "@/i18n/LanguageContext";
 
-type SortKey = "name-asc" | "name-desc" | "price-asc" | "price-desc";
-
 const LANGUAGES = [
   { code: "PL", label: "Polski", flag: "🇵🇱" },
   { code: "EN", label: "English", flag: "🇬🇧" },
   { code: "UA", label: "Українська", flag: "🇺🇦" },
 ] as const;
 
+const FEATURED_PRODUCT_ID = "zooy";
+
 const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
-  const [sortKey, setSortKey] = useState<SortKey>("name-asc");
 
-  const sortOptions: { key: SortKey; label: string }[] = [
-    { key: "name-asc", label: t.sortNameAsc },
-    { key: "name-desc", label: t.sortNameDesc },
-    { key: "price-asc", label: t.sortPriceAsc },
-    { key: "price-desc", label: t.sortPriceDesc },
-  ];
-
-  const sortedProducts = useMemo(() => {
-    const arr = [...products];
-    const priceOf = (p: typeof products[number]) => (p.tiers ? p.tiers[0].price : p.price);
-    switch (sortKey) {
-      case "name-asc":
-        return arr.sort((a, b) => a.name.localeCompare(b.name));
-      case "name-desc":
-        return arr.sort((a, b) => b.name.localeCompare(a.name));
-      case "price-asc":
-        return arr.sort((a, b) => priceOf(a) - priceOf(b));
-      case "price-desc":
-        return arr.sort((a, b) => priceOf(b) - priceOf(a));
-    }
-  }, [sortKey]);
-
-  const currentSortLabel = sortOptions.find((o) => o.key === sortKey)?.label ?? t.sort;
+  const featuredProducts = products.filter((p) => p.id === FEATURED_PRODUCT_ID);
 
   const menuItems = [
     { label: t.nav.shop, to: "/" },
@@ -100,15 +76,7 @@ const Index = () => {
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
 
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
-          <div className="flex-1 flex items-center gap-2 bg-secondary rounded-lg px-3 py-2.5">
-            <Search className="w-4 h-4 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder={t.searchPlaceholder}
-              className="bg-transparent flex-1 text-sm outline-none placeholder:text-muted-foreground"
-            />
-          </div>
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-end gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 text-sm hover:text-primary transition-colors outline-none" aria-label={t.language}>
               <Globe className="w-5 h-5" />
@@ -162,30 +130,10 @@ const Index = () => {
           </Sheet>
         </div>
 
-        {/* Filter bar */}
-        <div className="max-w-3xl mx-auto px-4 pb-3 grid grid-cols-2 gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
-              <span className="truncate">{currentSortLabel}</span>
-              <ChevronDown className="w-4 h-4 shrink-0" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
-              <DropdownMenuLabel>{t.sort}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {sortOptions.map((opt) => (
-                <DropdownMenuItem
-                  key={opt.key}
-                  onClick={() => setSortKey(opt.key)}
-                  className="cursor-pointer flex items-center gap-2"
-                >
-                  <span className="flex-1">{opt.label}</span>
-                  {sortKey === opt.key && <Check className="w-4 h-4 text-primary" />}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Smart price info */}
+        <div className="max-w-3xl mx-auto px-4 pb-3 flex justify-end">
           <Popover>
-            <PopoverTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2.5 text-sm hover:border-primary transition-colors outline-none">
+            <PopoverTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2 px-4 text-sm hover:border-primary transition-colors outline-none">
               {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72 text-sm leading-relaxed">
@@ -198,8 +146,8 @@ const Index = () => {
 
       {/* Products grid */}
       <div className="max-w-3xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {sortedProducts.map((p, idx) => {
+        <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
+          {featuredProducts.map((p, idx) => {
             const basePrice = p.tiers ? p.tiers[0].price : p.price;
             return (
               <article
