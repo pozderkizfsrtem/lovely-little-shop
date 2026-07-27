@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus, X, Globe, ShoppingCart, Menu, Info, Check } from "lucide-react";
@@ -18,7 +19,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { products, findProduct } from "@/data/products";
+import { findProduct, unitPriceFor } from "@/data/products";
 import { useCart } from "@/context/useCart";
 import { useLang } from "@/i18n/LanguageContext";
 
@@ -31,10 +32,23 @@ const LANGUAGES = [
 const FEATURED_PRODUCT_ID = "zooy";
 
 const Index = () => {
-  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct } = useCart();
+  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
+  const [flavor, setFlavor] = useState<string | null>(null);
 
-  const featuredProducts = products.filter((p) => p.id === FEATURED_PRODUCT_ID);
+  const product = findProduct(FEATURED_PRODUCT_ID)!;
+  const currentQty = qtyOfProduct(product.id);
+  const currentUnit = unitPriceFor(product, currentQty);
+
+  const productLines = items.filter((i) => i.productId === product.id);
+  const usedFlavors = new Set(productLines.map((l) => l.flavor));
+  const remainingFlavors = product.flavors.filter((f) => !usedFlavors.has(f));
+
+  const handleAdd = () => {
+    if (!flavor) return;
+    add(product.id, flavor);
+    setFlavor(null);
+  };
 
   const menuItems = [
     { label: t.nav.shop, to: "/" },
@@ -75,7 +89,6 @@ const Index = () => {
 
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
-
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-end gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 text-sm hover:text-primary transition-colors outline-none" aria-label={t.language}>
@@ -129,161 +142,175 @@ const Index = () => {
             </SheetContent>
           </Sheet>
         </div>
-
-        {/* Smart price info */}
-        <div className="max-w-3xl mx-auto px-4 pb-3 flex justify-end">
-          <Popover>
-            <PopoverTrigger className="flex items-center justify-center gap-2 bg-secondary border border-border rounded-lg py-2 px-4 text-sm hover:border-primary transition-colors outline-none">
-              {t.smartPrice} <Info className="w-4 h-4 text-muted-foreground" />
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-72 text-sm leading-relaxed">
-              <p className="font-semibold mb-1.5 text-primary">{t.smartPrice}</p>
-              <p className="text-muted-foreground">{t.smartPriceInfo}</p>
-            </PopoverContent>
-          </Popover>
-        </div>
       </div>
 
-      {/* Products grid */}
-      <div className="max-w-3xl mx-auto px-4 py-4">
-        <div className="grid grid-cols-1 gap-4 max-w-md mx-auto">
-          {featuredProducts.map((p, idx) => {
-            const basePrice = p.tiers ? p.tiers[0].price : p.price;
-            return (
-              <article
-                key={p.id}
-                className="card-glow rounded-xl overflow-hidden flex flex-col animate-fade-up"
-                style={{ animationDelay: `${idx * 60}ms` }}
-              >
-                <Link to={`/produkt/${p.id}`} className="block bg-secondary/40 aspect-square">
-                  <img
-                    src={p.image}
-                    alt={`Produkt ${p.name}`}
-                    width={500}
-                    height={500}
-                    loading="lazy"
-                    className="w-full h-full object-contain p-3"
-                  />
-                </Link>
+      {/* Product view */}
+      <div className="max-w-3xl mx-auto px-4 py-6">
+        <article className="card-glow rounded-2xl overflow-hidden animate-fade-up">
+          <div className="bg-secondary/40">
+            <img
+              src={product.image}
+              alt={product.name}
+              width={800}
+              height={800}
+              className="w-full aspect-square object-contain p-6"
+            />
+          </div>
 
-                <div className="px-3 pt-3 pb-2">
-                  <Link to={`/produkt/${p.id}`}>
-                    <h2 className="font-bold text-base sm:text-lg uppercase tracking-wide truncate">
-                      {p.name}
-                    </h2>
-                  </Link>
-                  <p className="text-orange font-bold text-base mt-1">{basePrice} {t.currency}</p>
+          <div className="p-5">
+            <h2 className="font-bold text-3xl uppercase tracking-wide">{product.name}</h2>
+            <p className="text-orange font-bold text-2xl mt-2">
+              {currentUnit} {t.currency}
+              <span className="text-muted-foreground text-sm font-normal ml-1">/ {t.pcs}</span>
+            </p>
+            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{product.longDesc}</p>
+
+            {product.tiers && product.tiers.length > 1 && (
+              <div className="mt-5 rounded-xl border border-border/60 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 bg-secondary/50">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {t.smartPrice}
+                  </p>
+                  <Popover>
+                    <PopoverTrigger aria-label={t.smartPrice} className="text-muted-foreground hover:text-primary transition-colors">
+                      <Info className="w-4 h-4" />
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-72 text-sm leading-relaxed">
+                      <p className="font-semibold mb-1.5 text-primary">{t.smartPrice}</p>
+                      <p className="text-muted-foreground">{t.smartPriceInfo}</p>
+                    </PopoverContent>
+                  </Popover>
                 </div>
+                <ul className="divide-y divide-border/40">
+                  {product.tiers.map((tier) => {
+                    const active =
+                      currentQty >= tier.minQty &&
+                      !product.tiers!.some((x) => x.minQty > tier.minQty && currentQty >= x.minQty);
+                    return (
+                      <li
+                        key={tier.minQty}
+                        className={`flex items-center justify-between px-4 py-2.5 text-sm ${
+                          active ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                        }`}
+                      >
+                        <span>
+                          {t.fromQty} {tier.minQty} {t.pieces}
+                        </span>
+                        <span className="font-semibold">
+                          {tier.price} {t.currency}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
 
-                {p.tiers && p.tiers.length > 1 && (
-                  <div className="px-3 py-3 border-t border-border/60">
-                    <p className="text-xs font-semibold text-muted-foreground mb-2">{t.smartPrice}</p>
-                    <ul className="space-y-1">
-                      {p.tiers
-                        .filter((tier) => tier.minQty > 1)
-                        .map((tier) => (
-                          <li key={tier.minQty} className="text-xs text-muted-foreground">
-                            {t.fromQty} {tier.minQty} {t.pieces} – <span className="text-foreground">{tier.price} {t.currency}</span>
-                          </li>
-                        ))}
-                    </ul>
-                  </div>
-                )}
+            <div className="mt-6">
+              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
+                {product.flavors.length > 0 ? "Wybierz smak" : ""}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {product.flavors.map((f) => {
+                  const active = flavor === f;
+                  return (
+                    <button
+                      key={f}
+                      onClick={() => setFlavor(f)}
+                      className={`px-4 py-2 rounded-full border text-sm transition-colors inline-flex items-center gap-2 ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:border-primary/60 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {active && <Check className="w-3 h-3" />}
+                      {tFlavor(f)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-                <div className="px-3 pb-3 mt-auto">
-                  <Link to={`/produkt/${p.id}`} className="block">
-                    <Button className="w-full gradient-orange text-primary-foreground font-semibold rounded-lg h-10 hover:opacity-95">
-                      {t.choose}
-                    </Button>
-                  </Link>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+            <Button
+              onClick={handleAdd}
+              disabled={!flavor}
+              size="lg"
+              className="w-full mt-6 gradient-orange text-primary-foreground font-semibold rounded-lg h-12 hover:opacity-95 disabled:opacity-40"
+            >
+              {flavor ? `${t.choose} — ${tFlavor(flavor)}` : t.choose}
+            </Button>
+          </div>
+        </article>
 
         {/* CART */}
-        {items.length > 0 && (
+        {productLines.length > 0 && (
           <div className="mt-8 card-glow rounded-xl p-5 animate-fade-up">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-xl uppercase">{t.yourCart}</h3>
-              <span className="text-xs font-semibold text-orange">{count} {t.pcs}</span>
+              <span className="text-xs font-semibold text-orange">
+                {count} {t.pcs}
+              </span>
             </div>
-            <ul className="space-y-4">
-              {Array.from(new Set(items.map((i) => i.productId))).map((pid) => {
-                const p = findProduct(pid);
-                if (!p) return null;
-                const unit = unitPriceOfProduct(pid);
-                const lines = items.filter((i) => i.productId === pid);
-                const totalQty = lines.reduce((s, i) => s + i.qty, 0);
-                const usedFlavors = new Set(lines.map((l) => l.flavor));
-                const remainingFlavors = p.flavors.filter((f) => !usedFlavors.has(f));
-                return (
-                  <li key={pid} className="py-3 border-b border-border/50 last:border-0">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold uppercase">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {unit} {t.perPiece} · {totalQty} {t.pcs}
-                        </p>
-                      </div>
-                      <span className="font-bold text-orange whitespace-nowrap">
-                        {unit * totalQty} {t.currency}
-                      </span>
-                    </div>
-                    <ul className="space-y-2 pl-3 border-l-2 border-primary/40">
-                       {lines.map((i) => (
-                        <li key={`${i.productId}-${i.flavor}`} className="flex items-center gap-3">
-                          <span className="flex-1 text-sm text-muted-foreground">{tFlavor(i.flavor)}</span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => sub(i.productId, i.flavor)}
-                              className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="w-5 text-center text-sm font-semibold">{i.qty}</span>
-                            <button
-                              onClick={() => add(i.productId, i.flavor)}
-                              className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => removeFlavor(i.productId, i.flavor)}
-                              aria-label={`${t.removeFlavor} ${tFlavor(i.flavor)}`}
-                              className="ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
-                            >
-                              <X className="w-3 h-3" /> {t.remove}
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {remainingFlavors.length > 0 && (
-                      <div className="mt-3 pl-3">
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
-                          {t.availableFlavors}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {remainingFlavors.map((f) => (
-                            <button
-                              key={f}
-                              onClick={() => add(pid, f)}
-                              className="px-3 py-1 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-                            >
-                              <Plus className="w-3 h-3" />
-                              {tFlavor(f)}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-bold uppercase">{product.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {currentUnit} {t.perPiece} · {currentQty} {t.pcs}
+                </p>
+              </div>
+              <span className="font-bold text-orange whitespace-nowrap">
+                {currentUnit * currentQty} {t.currency}
+              </span>
+            </div>
+            <ul className="space-y-2 pl-3 border-l-2 border-primary/40">
+              {productLines.map((i) => (
+                <li key={`${i.productId}-${i.flavor}`} className="flex items-center gap-3">
+                  <span className="flex-1 text-sm text-muted-foreground">{tFlavor(i.flavor)}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => sub(i.productId, i.flavor)}
+                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-5 text-center text-sm font-semibold">{i.qty}</span>
+                    <button
+                      onClick={() => add(i.productId, i.flavor)}
+                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => removeFlavor(i.productId, i.flavor)}
+                      aria-label={`${t.removeFlavor} ${tFlavor(i.flavor)}`}
+                      className="ml-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <X className="w-3 h-3" /> {t.remove}
+                    </button>
+                  </div>
+                </li>
+              ))}
             </ul>
+
+            {remainingFlavors.length > 0 && (
+              <div className="mt-4 pl-3">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                  {t.availableFlavors}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {remainingFlavors.map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => add(product.id, f)}
+                      className="px-3 py-1 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      {tFlavor(f)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
