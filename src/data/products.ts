@@ -1,6 +1,5 @@
 import zooyAsset from "@/assets/zooy-transparent.png.asset.json";
 
-
 export type PriceTier = { minQty: number; price: number };
 
 export type Product = {
@@ -29,40 +28,9 @@ export const products: Product[] = [
     longDesc:
       "Kultowa receptura w nowoczesnej odsłonie. Lekka, zrównoważona kompozycja na każdą okazję.",
     price: 40,
-    image: zooyImg,
+    image: zooyAsset.url,
     flavors: ["Klasyczny", "Wanilia", "Cytrus", "Mięta"],
     tiers: zooyTiers,
-  },
-  {
-    id: "zooy2",
-    name: "ZOOY 2",
-    desc: "Subtelniejsza odsłona.",
-    longDesc:
-      "Druga edycja kultowej linii — delikatniejsza, bardziej stonowana, z czystym profilem.",
-    price: 40,
-    image: zooy2Img,
-    flavors: ["Klasyczny", "Bergamotka", "Zielona herbata"],
-    tiers: zooyTiers,
-  },
-  {
-    id: "jed",
-    name: "JED",
-    desc: "Bogata, premium kompozycja.",
-    longDesc:
-      "Bogata kompozycja stworzona z myślą o najbardziej wymagających. Pełnia smaku w każdym detalu.",
-    price: 60,
-    image: jedImg,
-    flavors: ["Karmel", "Czekolada", "Espresso", "Whisky", "Tytoń"],
-  },
-  {
-    id: "jed2",
-    name: "JED 2",
-    desc: "Limitowana, głęboka edycja.",
-    longDesc:
-      "Wyrafinowana wariacja klasyki. Głęboka, pełna i niepowtarzalna — dla kolekcjonerów.",
-    price: 60,
-    image: jed2Img,
-    flavors: ["Wiśnia", "Dąb", "Kardamon", "Trufla"],
   },
 ];
 
