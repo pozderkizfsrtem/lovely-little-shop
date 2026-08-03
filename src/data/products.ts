@@ -1,7 +1,5 @@
-import zooyImg from "@/assets/zooy.jpg";
-import zooy2Img from "@/assets/zooy2.jpg";
-import jedImg from "@/assets/jed.jpg";
-import jed2Img from "@/assets/jed2.jpg";
+import zooyAsset from "@/assets/zooy-transparent.png.asset.json";
+
 
 export type PriceTier = { minQty: number; price: number };
 
