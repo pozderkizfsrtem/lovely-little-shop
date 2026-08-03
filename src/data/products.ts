@@ -28,7 +28,7 @@ export const products: Product[] = [
     longDesc:
       "Kultowa receptura w nowoczesnej odsłonie. Lekka, zrównoważona kompozycja na każdą okazję.",
     price: 40,
-    image: zooyAsset.url,
+    image: zooyImg,
     flavors: ["Klasyczny", "Wanilia", "Cytrus", "Mięta"],
     tiers: zooyTiers,
   },
