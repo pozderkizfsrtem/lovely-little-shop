@@ -1,4 +1,4 @@
-import zooyAsset from "@/assets/zooy-transparent.png.asset.json";
+const zooyImg = "/zooy-transparent.png";
 
 export type PriceTier = { minQty: number; price: number };
 
