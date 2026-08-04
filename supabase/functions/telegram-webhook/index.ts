@@ -1,6 +1,8 @@
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const BOT_USERNAME = "CoolRickbot";
 const MINI_APP_LINK = `https://t.me/${BOT_USERNAME}?startapp=shop`;
+const INFO_CHANNEL_LINK = "https://t.me/puffbotinfo";
+const MANAGER_LINK = "https://t.me/rickbigdic";
 
 async function deriveSecret(key: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`telegram-webhook:${key}`));
