@@ -1,6 +1,8 @@
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const BOT_USERNAME = "CoolRickbot";
 const MINI_APP_LINK = `https://t.me/${BOT_USERNAME}?startapp=shop`;
+const INFO_CHANNEL_LINK = "https://t.me/puffbotinfo";
+const MANAGER_LINK = "https://t.me/rickbigdic";
 
 async function deriveSecret(key: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`telegram-webhook:${key}`));
@@ -72,11 +74,15 @@ Deno.serve(async (req) => {
         text: "🛒 <b>PuffBot</b>\nWybierz smak i zamów w kilka sekund.",
         parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: [[
-            isGroup
-              ? { text: "Otwórz sklep", url: MINI_APP_LINK }
-              : { text: "Otwórz sklep", web_app: { url: "https://delight-boutique-showcase.lovable.app" } },
-          ]],
+          inline_keyboard: [
+            [
+              isGroup
+                ? { text: "Otwórz sklep", url: MINI_APP_LINK }
+                : { text: "Otwórz sklep", web_app: { url: "https://delight-boutique-showcase.lovable.app" } },
+            ],
+            [{ text: "📢 Kanał info", url: INFO_CHANNEL_LINK }],
+            [{ text: "💬 Kontakt z menadżerem", url: MANAGER_LINK }],
+          ],
         },
       },
       LOVABLE_API_KEY,
