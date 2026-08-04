@@ -15,9 +15,12 @@ export type Product = {
 };
 
 const zooyTiers: PriceTier[] = [
-  { minQty: 1, price: 40 },
-  { minQty: 20, price: 38 },
-  { minQty: 50, price: 35 },
+  { minQty: 1, price: 50 },
+  { minQty: 3, price: 40 },
+  { minQty: 5, price: 36 },
+  { minQty: 10, price: 32 },
+  { minQty: 20, price: 30 },
+  { minQty: 50, price: 28 },
 ];
 
 export const products: Product[] = [
