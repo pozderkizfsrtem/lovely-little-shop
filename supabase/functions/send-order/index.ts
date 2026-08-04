@@ -75,8 +75,11 @@ Deno.serve(async (req) => {
     const now = new Date().toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" });
 
     const usernameLine = payload.telegramUsername
-      ? `┃ <b>Telegram:</b> <a href="https://t.me/${escapeHtml(payload.telegramUsername)}">@${escapeHtml(payload.telegramUsername)}</a>\n`
-      : "";
+      ? `┃ <b>Nazwa użytkownika:</b> <a href="https://t.me/${escapeHtml(payload.telegramUsername)}">@${escapeHtml(payload.telegramUsername)}</a>\n`
+      : payload.telegramUserId
+        ? `┃ <b>Nazwa użytkownika:</b> brak (Telegram ID: <code>${payload.telegramUserId}</code>)\n`
+        : `┃ <b>Nazwa użytkownika:</b> brak (zamówienie ze strony)\n`;
+
 
     const text =
       `🛒 <b>NOWE ZAMÓWIENIE</b> ${orderId}\n` +
