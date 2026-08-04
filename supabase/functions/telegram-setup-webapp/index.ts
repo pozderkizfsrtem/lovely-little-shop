@@ -3,6 +3,14 @@ import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const WEBAPP_URL = "https://delight-boutique-showcase.lovable.app";
 
+const deriveSecret = async (key: string): Promise<string> => {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`telegram-webhook:${key}`));
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+};
+
 const tg = async (
   method: string,
   body: Record<string, unknown>,
@@ -56,15 +64,28 @@ Deno.serve(async (req) => {
       {
         commands: [
           { command: "start", description: "Otwórz sklep" },
-          { command: "shop", description: "Otwórz sklep Maison" },
+          { command: "shop", description: "Otwórz sklep PuffBot" },
         ],
       },
       LOVABLE_API_KEY,
       TELEGRAM_API_KEY,
     );
 
+    // 3) Register the webhook so the bot answers /shop in groups
+    const secret = await deriveSecret(TELEGRAM_API_KEY);
+    const hook = await tg(
+      "setWebhook",
+      {
+        url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/telegram-webhook`,
+        secret_token: secret,
+        allowed_updates: ["message", "edited_message"],
+      },
+      LOVABLE_API_KEY,
+      TELEGRAM_API_KEY,
+    );
+
     return new Response(
-      JSON.stringify({ success: true, menu, cmds, webapp_url: WEBAPP_URL }),
+      JSON.stringify({ success: true, menu, cmds, hook, webapp_url: WEBAPP_URL }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
