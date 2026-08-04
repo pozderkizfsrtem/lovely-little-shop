@@ -72,11 +72,15 @@ Deno.serve(async (req) => {
         text: "🛒 <b>PuffBot</b>\nWybierz smak i zamów w kilka sekund.",
         parse_mode: "HTML",
         reply_markup: {
-          inline_keyboard: [[
-            isGroup
-              ? { text: "Otwórz sklep", url: MINI_APP_LINK }
-              : { text: "Otwórz sklep", web_app: { url: "https://delight-boutique-showcase.lovable.app" } },
-          ]],
+          inline_keyboard: [
+            [
+              isGroup
+                ? { text: "Otwórz sklep", url: MINI_APP_LINK }
+                : { text: "Otwórz sklep", web_app: { url: "https://delight-boutique-showcase.lovable.app" } },
+            ],
+            [{ text: "📢 Kanał info", url: INFO_CHANNEL_LINK }],
+            [{ text: "💬 Kontakt z menadżerem", url: MANAGER_LINK }],
+          ],
         },
       },
       LOVABLE_API_KEY,
