@@ -87,21 +87,21 @@ const Product = () => {
             <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">
               Wybierz smak
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {product.flavors.map((f) => {
                 const active = flavor === f;
                 return (
                   <button
                     key={f}
                     onClick={() => setFlavor(f)}
-                    className={`px-4 py-2 rounded-full border text-sm transition-colors flex items-center gap-2 ${
+                    className={`px-3 py-2.5 rounded-lg border text-sm transition-colors flex items-center justify-center gap-2 text-center ${
                       active
                         ? "border-gold bg-gold/10 text-gold"
                         : "border-border hover:border-gold/60"
                     }`}
                   >
-                    {active && <Check className="w-3 h-3" />}
-                    {f}
+                    {active && <Check className="w-3 h-3 shrink-0" />}
+                    <span className="truncate">{f}</span>
                   </button>
                 );
               })}

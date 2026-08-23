@@ -210,21 +210,21 @@ const Index = () => {
               <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
                 {product.flavors.length > 0 ? "Wybierz smak" : ""}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {product.flavors.map((f) => {
                   const active = flavor === f;
                   return (
                     <button
                       key={f}
                       onClick={() => setFlavor(f)}
-                      className={`px-4 py-2 rounded-full border text-sm transition-colors inline-flex items-center gap-2 ${
+                      className={`px-3 py-2.5 rounded-lg border text-sm transition-colors inline-flex items-center justify-center gap-2 text-center ${
                         active
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:border-primary/60 text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      {active && <Check className="w-3 h-3" />}
-                      {tFlavor(f)}
+                      {active && <Check className="w-3 h-3 shrink-0" />}
+                      <span className="truncate">{tFlavor(f)}</span>
                     </button>
                   );
                 })}
@@ -297,15 +297,15 @@ const Index = () => {
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
                   {t.availableFlavors}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {remainingFlavors.map((f) => (
                     <button
                       key={f}
                       onClick={() => add(product.id, f)}
-                      className="px-3 py-1 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center justify-center gap-1 text-center"
                     >
-                      <Plus className="w-3 h-3" />
-                      {tFlavor(f)}
+                      <Plus className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{tFlavor(f)}</span>
                     </button>
                   ))}
                 </div>
