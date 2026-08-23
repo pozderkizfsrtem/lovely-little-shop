@@ -64,16 +64,6 @@ Deno.serve(async (req) => {
           action === "pay"
             ? "┃ 🟢 <b>Opłacone</b>"
             : "┃ 🔵 <b>Wysłane</b>";
-        const buttons = [
-          {
-            text: action === "pay" ? "✅ Opłacone" : "💳 Opłacone",
-            callback_data: "o|pay",
-          },
-          {
-            text: action === "ship" ? "✅ Wysłane" : "📦 Wysłane",
-            callback_data: "o|ship",
-          },
-        ];
 
         await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
 
@@ -89,7 +79,6 @@ Deno.serve(async (req) => {
             message_id: cq.message?.message_id,
             text: newText,
             parse_mode: "HTML",
-            reply_markup: { inline_keyboard: [buttons] },
           },
           LOVABLE_API_KEY,
           TELEGRAM_API_KEY,
