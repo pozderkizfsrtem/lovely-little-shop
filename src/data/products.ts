@@ -29,7 +29,7 @@ export const products: Product[] = [
     name: "ZOOY",
     desc: "Klasyk w lekkiej formule.",
     longDesc:
-      "Kultowa receptura w nowoczesnej odsłonie. Lekka, zrównoważona kompozycja na każdą okazję.",
+      "Starannie opracowany liquid do e-papierosów o wyrazistym aromacie i dopracowanej kompozycji smakowej.",
     price: 40,
     image: zooyImg,
     flavors: ["Klasyczny", "Wanilia", "Cytrus", "Mięta"],
