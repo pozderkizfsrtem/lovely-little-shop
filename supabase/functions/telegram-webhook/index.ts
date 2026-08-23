@@ -53,6 +53,55 @@ Deno.serve(async (req) => {
 
   try {
     const update = await req.json();
+
+    // Handle order status button clicks (from send-order messages).
+    if (update.callback_query) {
+      const cq = update.callback_query;
+      const data: string = cq.data ?? "";
+      const action = data.split("|")[1];
+      if (action === "pay" || action === "ship") {
+        const statusLine =
+          action === "pay"
+            ? "┃ 🟢 <b>Opłacone</b>"
+            : "┃ 🔵 <b>Wysłane</b>";
+        const buttons = [
+          {
+            text: action === "pay" ? "✅ Opłacone" : "💳 Opłacone",
+            callback_data: "o|pay",
+          },
+          {
+            text: action === "ship" ? "✅ Wysłane" : "📦 Wysłane",
+            callback_data: "o|ship",
+          },
+        ];
+
+        await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+
+        const origText: string = cq.message?.text ?? "";
+        const newText = origText.replace(
+          /📊 <b>STATUS<\/b>\n┃ .+/,
+          `📊 <b>STATUS</b>\n${statusLine}`,
+        );
+        await tg(
+          "editMessageText",
+          {
+            chat_id: cq.message?.chat?.id,
+            message_id: cq.message?.message_id,
+            text: newText,
+            parse_mode: "HTML",
+            reply_markup: { inline_keyboard: [buttons] },
+          },
+          LOVABLE_API_KEY,
+          TELEGRAM_API_KEY,
+        );
+      } else {
+        await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const msg = update.message ?? update.edited_message;
     const chat = msg?.chat;
     if (!chat?.id) return new Response(JSON.stringify({ ok: true }));

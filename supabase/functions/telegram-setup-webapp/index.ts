@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       {
         url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/telegram-webhook`,
         secret_token: secret,
-        allowed_updates: ["message", "edited_message"],
+        allowed_updates: ["message", "edited_message", "callback_query"],
       },
       LOVABLE_API_KEY,
       TELEGRAM_API_KEY,
