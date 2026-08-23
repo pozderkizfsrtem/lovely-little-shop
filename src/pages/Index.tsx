@@ -297,15 +297,15 @@ const Index = () => {
                 <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
                   {t.availableFlavors}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {remainingFlavors.map((f) => (
                     <button
                       key={f}
                       onClick={() => add(product.id, f)}
-                      className="px-3 py-1 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-md border border-border hover:border-primary text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center justify-center gap-1 text-center"
                     >
-                      <Plus className="w-3 h-3" />
-                      {tFlavor(f)}
+                      <Plus className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{tFlavor(f)}</span>
                     </button>
                   ))}
                 </div>
