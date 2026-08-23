@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       `━━━━━━━━━━━━━━━━━━\n` +
       `💰 <b>RAZEM: ${payload.total} zł</b>`;
 
-    const sendTo = async (chatId: string | number) => {
+    const sendTo = async (chatId: string | number, replyMarkup?: Record<string, unknown>) => {
       const r = await fetch(`${GATEWAY_URL}/sendMessage`, {
         method: "POST",
         headers: {
@@ -108,13 +108,28 @@ Deno.serve(async (req) => {
           "X-Connection-Api-Key": TELEGRAM_API_KEY,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+          parse_mode: "HTML",
+          ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+        }),
       });
       const d = await r.json();
       return { ok: r.ok, status: r.status, data: d };
     };
 
-    const ownerRes = await sendTo(TELEGRAM_CHAT_ID);
+    // Inline keyboard for the owner to change the order status.
+    const statusButtons = {
+      inline_keyboard: [
+        [
+          { text: "💳 Opłacone", callback_data: "o|pay" },
+          { text: "📦 Wysłane", callback_data: "o|ship" },
+        ],
+      ],
+    };
+
+    const ownerRes = await sendTo(TELEGRAM_CHAT_ID, statusButtons);
     if (!ownerRes.ok) {
       throw new Error(`Telegram API failed [${ownerRes.status}]: ${JSON.stringify(ownerRes.data)}`);
     }
