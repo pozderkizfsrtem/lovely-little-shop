@@ -29,7 +29,7 @@ const Reviews = () => (
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 text-gold hover:underline font-medium"
         >
-          kanał z opiniami ->
+          kanał z opiniami -&gt;
         </a>
       </div>
     </div>
