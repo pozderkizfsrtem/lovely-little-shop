@@ -4,7 +4,7 @@ const Contact = () => (
   <InfoPage eyebrow="Skontaktuj się" title="Kontakt">
     <p>Masz pytania? Chętnie pomożemy.</p>
     <h2>Email</h2>
-    <p>hello@maison.com</p>
+    <p>@PuffBotMenager</p>
   </InfoPage>
 );
 
