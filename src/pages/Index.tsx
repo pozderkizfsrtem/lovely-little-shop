@@ -65,27 +65,72 @@ const Index = () => {
   return (
     <main className="min-h-screen text-foreground">
       {/* Brand header */}
-      <header className="relative max-w-3xl mx-auto px-4 pt-8 pb-4 text-center">
-        <h1
-          className="font-display font-extrabold tracking-tight text-5xl sm:text-6xl md:text-7xl uppercase bg-clip-text text-transparent inline-block"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, hsl(185 100% 70%), hsl(205 100% 60%) 45%, hsl(225 100% 65%))",
-            filter: "drop-shadow(0 6px 24px hsl(205 100% 55% / 0.55))",
-            letterSpacing: "-0.04em",
-          }}
-        >
-          PuffBot
-        </h1>
+      <header className="relative max-w-3xl mx-auto px-4 pt-10 pb-6 text-center">
+        <div className="relative inline-block puffbot-3d-wrap">
+          {/* Back glow layer */}
+          <span
+            aria-hidden
+            className="absolute inset-0 font-display font-black tracking-tight text-6xl sm:text-7xl md:text-8xl uppercase blur-2xl opacity-70 select-none"
+            style={{
+              color: "hsl(200 100% 60%)",
+              letterSpacing: "-0.05em",
+              transform: "translateY(6px)",
+            }}
+          >
+            PuffBot
+          </span>
+          {/* Shadow / depth layer */}
+          <span
+            aria-hidden
+            className="absolute inset-0 font-display font-black tracking-tight text-6xl sm:text-7xl md:text-8xl uppercase select-none"
+            style={{
+              color: "hsl(220 80% 8%)",
+              letterSpacing: "-0.05em",
+              transform: "translate(3px, 6px)",
+              WebkitTextStroke: "1px hsl(210 90% 30% / 0.6)",
+            }}
+          >
+            PuffBot
+          </span>
+          {/* Main gradient layer */}
+          <h1
+            className="relative font-display font-black tracking-tight text-6xl sm:text-7xl md:text-8xl uppercase bg-clip-text text-transparent"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, hsl(190 100% 92%) 0%, hsl(195 100% 78%) 30%, hsl(205 100% 58%) 55%, hsl(220 90% 42%) 80%, hsl(225 85% 30%) 100%)",
+              letterSpacing: "-0.05em",
+              filter:
+                "drop-shadow(0 2px 0 hsl(210 90% 25%)) drop-shadow(0 4px 0 hsl(220 90% 18%)) drop-shadow(0 12px 30px hsl(205 100% 55% / 0.55))",
+              WebkitTextStroke: "1px hsl(200 100% 85% / 0.35)",
+            }}
+          >
+            PuffBot
+          </h1>
+          {/* Specular highlight */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 font-display font-black tracking-tight text-6xl sm:text-7xl md:text-8xl uppercase bg-clip-text text-transparent select-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, hsl(0 0% 100% / 0.9) 0%, hsl(0 0% 100% / 0.15) 35%, transparent 55%)",
+              letterSpacing: "-0.05em",
+              mixBlendMode: "screen",
+            }}
+          >
+            PuffBot
+          </span>
+        </div>
         <span
           aria-hidden
-          className="block mx-auto mt-2 h-1 w-24 rounded-full"
+          className="block mx-auto mt-4 h-1 w-32 rounded-full"
           style={{
             background:
               "linear-gradient(90deg, transparent, hsl(195 100% 65%), transparent)",
+            boxShadow: "0 0 20px hsl(195 100% 60% / 0.7)",
           }}
         />
       </header>
+
 
       {/* Top bar */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
