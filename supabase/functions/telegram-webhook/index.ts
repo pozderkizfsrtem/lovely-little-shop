@@ -60,30 +60,52 @@ Deno.serve(async (req) => {
       const data: string = cq.data ?? "";
       const action = data.split("|")[1];
       if (action === "pay" || action === "ship") {
-        const statusLine =
-          action === "pay"
-            ? "┃ 🟢 <b>Opłacone</b>"
-            : "┃ 🔵 <b>Wysłane</b>";
-
         await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
 
+        // Telegram gives us PLAIN text (no HTML) + entities. We patch the status
+        // line in the plain text and shift/rebuild entities so bold survives.
         const origText: string = cq.message?.text ?? "";
-        const newText = origText.replace(
-          /📊 <b>STATUS<\/b>\n┃ .+/,
-          `📊 <b>STATUS</b>\n${statusLine}`,
-        );
+        const entities: Array<{ type: string; offset: number; length: number; [k: string]: unknown }> =
+          cq.message?.entities ?? [];
+
+        const newLabel = action === "pay" ? "🟢 Opłacone" : "🔵 Wysłane";
+
+        const marker = "┃ ";
+        const statusHeader = origText.indexOf("STATUS");
+        const lineStart = statusHeader === -1 ? -1 : origText.indexOf(marker, statusHeader);
+        if (lineStart === -1) {
+          console.error("Status line not found in message text");
+          return new Response(JSON.stringify({ ok: true }), {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        const valueStart = lineStart + marker.length;
+        let lineEnd = origText.indexOf("\n", valueStart);
+        if (lineEnd === -1) lineEnd = origText.length;
+
+        const newText = origText.slice(0, valueStart) + newLabel + origText.slice(lineEnd);
+        const delta = newLabel.length - (lineEnd - valueStart);
+
+        const newEntities = entities
+          .filter((e) => e.offset + e.length <= valueStart || e.offset >= lineEnd)
+          .map((e) => (e.offset >= lineEnd ? { ...e, offset: e.offset + delta } : e));
+        newEntities.push({ type: "bold", offset: valueStart, length: newLabel.length });
+        newEntities.sort((a, b) => a.offset - b.offset);
+
         await tg(
           "editMessageText",
           {
             chat_id: cq.message?.chat?.id,
             message_id: cq.message?.message_id,
             text: newText,
-            parse_mode: "HTML",
+            entities: newEntities,
+            reply_markup: cq.message?.reply_markup,
           },
           LOVABLE_API_KEY,
           TELEGRAM_API_KEY,
         );
       } else {
+
         await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
       }
       return new Response(JSON.stringify({ ok: true }), {
