@@ -22,6 +22,16 @@ const Reviews = () => (
           <p className="text-sm text-muted-foreground">— {r.name}</p>
         </div>
       ))}
+      <div className="pt-2">
+        <a
+          href="https://t.me/+aRSk2tlzymgxYWY0"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-gold hover:underline font-medium"
+        >
+          kanał z opiniami
+        </a>
+      </div>
     </div>
   </InfoPage>
 );
