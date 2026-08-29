@@ -3,6 +3,37 @@ const BOT_USERNAME = "CoolRickbot";
 const MINI_APP_LINK = `https://t.me/${BOT_USERNAME}?startapp=shop`;
 const INFO_CHANNEL_LINK = "https://t.me/puffbotinfo";
 const MANAGER_LINK = "https://t.me/rickbigdic";
+const BOT_DEEP_LINK = `https://t.me/${BOT_USERNAME}?start=shop`;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const settingsUrl = (key: string) =>
+  `${SUPABASE_URL}/rest/v1/bot_settings?key=eq.${encodeURIComponent(key)}&select=value`;
+
+const dbHeaders = {
+  apikey: SERVICE_KEY,
+  Authorization: `Bearer ${SERVICE_KEY}`,
+  "Content-Type": "application/json",
+};
+
+async function getSetting(key: string): Promise<string | null> {
+  const res = await fetch(settingsUrl(key), { headers: dbHeaders });
+  if (!res.ok) {
+    console.error(`getSetting failed [${res.status}]:`, await res.text());
+    return null;
+  }
+  const rows = (await res.json()) as Array<{ value: string }>;
+  return rows[0]?.value ?? null;
+}
+
+async function setSetting(key: string, value: string) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bot_settings`, {
+    method: "POST",
+    headers: { ...dbHeaders, Prefer: "resolution=merge-duplicates" },
+    body: JSON.stringify({ key, value, updated_at: new Date().toISOString() }),
+  });
+  if (!res.ok) console.error(`setSetting failed [${res.status}]:`, await res.text());
+}
 
 async function deriveSecret(key: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`telegram-webhook:${key}`));
@@ -53,6 +84,40 @@ Deno.serve(async (req) => {
 
   try {
     const update = await req.json();
+    const OWNER_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
+
+    // Bot promoted/added in a channel -> remember it as the announcement channel.
+    const memberUpdate = update.my_chat_member;
+    if (memberUpdate?.chat?.type === "channel") {
+      const status = memberUpdate.new_chat_member?.status;
+      if (status === "administrator" || status === "member") {
+        await setSetting("announce_chat_id", String(memberUpdate.chat.id));
+        if (OWNER_CHAT_ID) {
+          await tg(
+            "sendMessage",
+            {
+              chat_id: OWNER_CHAT_ID,
+              text: `✅ Kana\u0142 <b>${memberUpdate.chat.title ?? "PuffBot"}</b> zapisany.\nWy\u015blij mi <code>/post tre\u015b\u0107</code>, aby opublikowa\u0107 og\u0142oszenie.`,
+              parse_mode: "HTML",
+            },
+            LOVABLE_API_KEY,
+            TELEGRAM_API_KEY,
+          );
+        }
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Any post inside a channel also identifies the channel.
+    const channelPost = update.channel_post ?? update.edited_channel_post;
+    if (channelPost?.chat?.id) {
+      await setSetting("announce_chat_id", String(channelPost.chat.id));
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     // Handle order status button clicks (from send-order messages).
     if (update.callback_query) {
@@ -118,6 +183,69 @@ Deno.serve(async (req) => {
     if (!chat?.id) return new Response(JSON.stringify({ ok: true }));
 
     const text: string = msg.text ?? "";
+
+    // Owner-only: /post <tekst> publishes an announcement on the PuffBot channel.
+    const postMatch = text.trim().match(/^\/post(?:@\w+)?(?:\s+([\s\S]+))?$/i);
+    if (postMatch) {
+      if (String(chat.id) !== String(OWNER_CHAT_ID)) {
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      const body = postMatch[1]?.trim();
+      const announceChat = await getSetting("announce_chat_id");
+      if (!body) {
+        await tg(
+          "sendMessage",
+          {
+            chat_id: chat.id,
+            text: "✍️ U\u017cyj: <code>/post tre\u015b\u0107 og\u0142oszenia</code>\nOg\u0142oszenie pojawi si\u0119 na kanale z przyciskiem do sklepu.",
+            parse_mode: "HTML",
+          },
+          LOVABLE_API_KEY,
+          TELEGRAM_API_KEY,
+        );
+      } else if (!announceChat) {
+        await tg(
+          "sendMessage",
+          {
+            chat_id: chat.id,
+            text: "⚠️ Nie znam jeszcze kana\u0142u. Dodaj bota jako administratora kana\u0142u PuffBot (z prawem publikowania), potem spr\u00f3buj ponownie.",
+          },
+          LOVABLE_API_KEY,
+          TELEGRAM_API_KEY,
+        );
+      } else {
+        const sent = await tg(
+          "sendMessage",
+          {
+            chat_id: announceChat,
+            text: body,
+            parse_mode: "HTML",
+            reply_markup: {
+              inline_keyboard: [[{ text: "🛒 Otw\u00f3rz sklep PuffBot", url: BOT_DEEP_LINK }]],
+            },
+          },
+          LOVABLE_API_KEY,
+          TELEGRAM_API_KEY,
+        );
+        await tg(
+          "sendMessage",
+          {
+            chat_id: chat.id,
+            text: sent?.ok === false
+              ? `❌ Nie uda\u0142o si\u0119 opublikowa\u0107: ${sent?.description ?? "b\u0142\u0105d"}`
+              : "✅ Og\u0142oszenie opublikowane na kanale.",
+          },
+          LOVABLE_API_KEY,
+          TELEGRAM_API_KEY,
+        );
+      }
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
     const isCommand = /^\/(start|shop|sklep)(@\w+)?\b/i.test(text.trim());
     const botAdded = (msg.new_chat_members ?? []).some(
       (m: { username?: string }) => m.username === BOT_USERNAME,
