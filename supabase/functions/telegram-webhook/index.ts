@@ -3,6 +3,7 @@ const BOT_USERNAME = "CoolRickbot";
 const MINI_APP_LINK = `https://t.me/${BOT_USERNAME}?startapp=shop`;
 const INFO_CHANNEL_LINK = "https://t.me/puffbotinfo";
 const MANAGER_LINK = "https://t.me/rickbigdic";
+const REVIEWS_CHANNEL_LINK = "https://t.me/+aRSk2tlzymgxYWY0";
 const BOT_DEEP_LINK = `https://t.me/${BOT_USERNAME}?start=shop`;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -236,7 +237,11 @@ Deno.serve(async (req) => {
             text: body,
             parse_mode: "HTML",
             reply_markup: {
-              inline_keyboard: [[{ text: "🛒 Otw\u00f3rz sklep PuffBot", url: BOT_DEEP_LINK }]],
+              inline_keyboard: [
+                [{ text: "🛒 Otw\u00f3rz sklep PuffBot", url: BOT_DEEP_LINK }],
+                [{ text: "⭐ Opinie", url: REVIEWS_CHANNEL_LINK }],
+                [{ text: "💬 Kontakt z menad\u017cerem", url: MANAGER_LINK }],
+              ],
             },
           },
           LOVABLE_API_KEY,
