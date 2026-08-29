@@ -2,7 +2,7 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 const BOT_USERNAME = "CoolRickbot";
 const MINI_APP_LINK = `https://t.me/${BOT_USERNAME}?startapp=shop`;
 const INFO_CHANNEL_LINK = "https://t.me/puffbotinfo";
-const MANAGER_LINK = "https://t.me/rickbigdic";
+const MANAGER_LINK = "https://t.me/PuffBotMenager";
 const REVIEWS_CHANNEL_LINK = "https://t.me/+aRSk2tlzymgxYWY0";
 const BOT_DEEP_LINK = `https://t.me/${BOT_USERNAME}?start=shop`;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
