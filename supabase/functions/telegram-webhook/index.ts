@@ -86,19 +86,31 @@ Deno.serve(async (req) => {
     const update = await req.json();
     const OWNER_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID") ?? "";
 
-    // Bot promoted/added in a channel -> remember it as the announcement channel.
+    // Bot added/promoted in a channel or group -> remember it as the announcement chat.
     const memberUpdate = update.my_chat_member;
-    if (memberUpdate?.chat?.type === "channel") {
+    const mChatType = memberUpdate?.chat?.type;
+    if (mChatType === "channel" || mChatType === "group" || mChatType === "supergroup") {
       const status = memberUpdate.new_chat_member?.status;
-      if (status === "administrator" || status === "member") {
+      console.log("my_chat_member:", mChatType, status, memberUpdate.chat.id);
+      if (status === "administrator" || status === "member" || status === "creator") {
         await setSetting("announce_chat_id", String(memberUpdate.chat.id));
+        const title = memberUpdate.chat.title ?? "PuffBot";
+        const notice = `✅ Czat <b>${title}</b> zapisany (${mChatType}).\nWyślij mi <code>/post treść</code>, aby opublikować ogłoszenie.`;
         if (OWNER_CHAT_ID) {
           await tg(
             "sendMessage",
+            { chat_id: OWNER_CHAT_ID, text: notice, parse_mode: "HTML" },
+            LOVABLE_API_KEY,
+            TELEGRAM_API_KEY,
+          );
+        }
+        // Also confirm in the chat itself when it is a group (channels: skip noise).
+        if (mChatType !== "channel") {
+          await tg(
+            "sendMessage",
             {
-              chat_id: OWNER_CHAT_ID,
-              text: `✅ Kana\u0142 <b>${memberUpdate.chat.title ?? "PuffBot"}</b> zapisany.\nWy\u015blij mi <code>/post tre\u015b\u0107</code>, aby opublikowa\u0107 og\u0142oszenie.`,
-              parse_mode: "HTML",
+              chat_id: memberUpdate.chat.id,
+              text: "✅ PuffBot gotowy. Wpisz /shop, aby otworzyć sklep.",
             },
             LOVABLE_API_KEY,
             TELEGRAM_API_KEY,
@@ -109,6 +121,7 @@ Deno.serve(async (req) => {
         headers: { "Content-Type": "application/json" },
       });
     }
+
 
     // Any post inside a channel also identifies the channel.
     const channelPost = update.channel_post ?? update.edited_channel_post;
