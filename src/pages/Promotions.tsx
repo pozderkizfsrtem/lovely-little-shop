@@ -1,12 +1,16 @@
 import InfoPage from "./InfoPage";
+import { useLang } from "@/i18n/LanguageContext";
 
-const Promotions = () => (
-  <InfoPage eyebrow="Informacje" title="Zasady promocji">
-    <p>Promocje obowiązują przez ograniczony czas lub do wyczerpania zapasów.</p>
-    <p>Zniżki nie sumują się, chyba że warunki promocji mówią inaczej.</p>
-    <p>Niektóre akcje wymagają kodu rabatowego lub minimalnej wartości zamówienia.</p>
-    <p>Śledź nasze aktualizacje — regularnie przygotowujemy nowe oferty.</p>
-  </InfoPage>
-);
+const Promotions = () => {
+  const { t } = useLang();
+  const p = t.pages.promotions;
+  return (
+    <InfoPage eyebrow={p.eyebrow} title={p.title}>
+      {p.paragraphs.map((text, i) => (
+        <p key={i}>{text}</p>
+      ))}
+    </InfoPage>
+  );
+};
 
 export default Promotions;
