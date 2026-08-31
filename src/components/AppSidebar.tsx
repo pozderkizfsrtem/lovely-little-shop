@@ -34,7 +34,7 @@ export function AppSidebar() {
       <SidebarHeader className="px-4 py-5 border-b border-sidebar-border">
         {!collapsed && (
           <span className="font-display text-xl">
-            Maison<span className="text-gold">.</span>
+            PuffBot<span className="text-gold">.</span>
           </span>
         )}
       </SidebarHeader>
