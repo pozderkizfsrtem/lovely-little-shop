@@ -1,12 +1,16 @@
 import InfoPage from "./InfoPage";
+import { useLang } from "@/i18n/LanguageContext";
 
-const Delivery = () => (
-  <InfoPage eyebrow="Informacje" title="Dostawa">
-    <p>Wysyłamy zamówienia na terenie całego kraju wygodnymi metodami dostawy.</p>
-    <p>Standardowy czas dostawy to <strong>1-3 dni robocze</strong> od momentu potwierdzenia zamówienia.</p>
-    <p>Koszt dostawy zależy od wybranej opcji i widoczny jest w trakcie składania zamówienia.</p>
-    <p>Po wysłaniu przesyłki otrzymasz numer śledzenia, aby sprawdzać status paczki.</p>
-  </InfoPage>
-);
+const Delivery = () => {
+  const { t } = useLang();
+  const p = t.pages.delivery;
+  return (
+    <InfoPage eyebrow={p.eyebrow} title={p.title}>
+      {p.paragraphs.map((text, i) => (
+        <p key={i}>{text}</p>
+      ))}
+    </InfoPage>
+  );
+};
 
 export default Delivery;

@@ -1,12 +1,16 @@
 import InfoPage from "./InfoPage";
+import { useLang } from "@/i18n/LanguageContext";
 
-const Returns = () => (
-  <InfoPage eyebrow="Polityka" title="Zwroty i wymiany">
-    <p>Masz <strong>14 dni</strong> na zwrot produktu, o ile nie był używany.</p>
-    <p>Zachowaj oryginalne opakowanie i akcesoria, aby przyspieszyć proces.</p>
-    <p>Skontaktuj się z naszym wsparciem, które wyjaśni, jak krok po kroku dokonać zwrotu.</p>
-    <p>Każdą sprawę rozpatrujemy indywidualnie, aby jak najszybciej znaleźć rozwiązanie.</p>
-  </InfoPage>
-);
+const Returns = () => {
+  const { t } = useLang();
+  const p = t.pages.returns;
+  return (
+    <InfoPage eyebrow={p.eyebrow} title={p.title}>
+      {p.paragraphs.map((text, i) => (
+        <p key={i}>{text}</p>
+      ))}
+    </InfoPage>
+  );
+};
 
 export default Returns;

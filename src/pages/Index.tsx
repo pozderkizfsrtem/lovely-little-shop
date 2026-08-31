@@ -208,7 +208,7 @@ const Index = () => {
               {currentUnit} {t.currency}
               <span className="text-muted-foreground text-sm font-normal ml-1">/ {t.pcs}</span>
             </p>
-            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{product.longDesc}</p>
+            <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{t.productDesc}</p>
 
             {product.tiers && product.tiers.length > 1 && (
               <div className="mt-5 rounded-xl border border-border/60 overflow-hidden">
@@ -253,7 +253,7 @@ const Index = () => {
 
             <div className="mt-6">
               <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
-                {product.flavors.length > 0 ? "Wybierz smak" : ""}
+                {product.flavors.length > 0 ? t.pickFlavor : ""}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {product.flavors.map((f) => {
