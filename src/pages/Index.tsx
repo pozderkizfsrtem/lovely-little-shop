@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Minus, X, Globe, ShoppingCart, Menu, Info, Check } from "lucide-react";
@@ -35,6 +36,12 @@ const Index = () => {
   const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
   const [flavor, setFlavor] = useState<string | null>(null);
+  const [stock, setStock] = useState<Record<string, number>>({});
+  useEffect(() => {
+    supabase.functions.invoke("get-stock").then(({ data }) => {
+      if (data?.stock) setStock(data.stock);
+    });
+  }, []);
 
   const product = findProduct(FEATURED_PRODUCT_ID)!;
   const currentQty = qtyOfProduct(product.id);
@@ -258,18 +265,23 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-2">
                 {product.flavors.map((f) => {
                   const active = flavor === f;
+                  const soldOut = stock[f.toLowerCase()] === 0;
                   return (
                     <button
                       key={f}
-                      onClick={() => setFlavor(f)}
+                      onClick={() => !soldOut && setFlavor(f)}
+                      disabled={soldOut}
                       className={`px-3 py-2.5 rounded-lg border text-sm transition-colors inline-flex items-center justify-center gap-2 text-center ${
-                        active
+                        soldOut
+                          ? "border-border text-muted-foreground/50 line-through cursor-not-allowed"
+                          : active
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border hover:border-primary/60 text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {active && <Check className="w-3 h-3 shrink-0" />}
                       <span className="truncate">{tFlavor(f)}</span>
+                      {soldOut && <span className="no-underline text-[10px] font-bold text-destructive shrink-0">SOLD OUT</span>}
                     </button>
                   );
                 })}

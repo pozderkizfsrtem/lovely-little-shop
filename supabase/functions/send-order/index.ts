@@ -134,6 +134,24 @@ Deno.serve(async (req) => {
       throw new Error(`Telegram API failed [${ownerRes.status}]: ${JSON.stringify(ownerRes.data)}`);
     }
 
+    // Remember ordered flavors so "Wysłane" can deduct them from stock.
+    const messageId = ownerRes.data?.result?.message_id;
+    if (messageId) {
+      const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+      const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const items = payload.items.map((i) => ({ flavor: String(i.flavor).slice(0, 80), qty: Math.max(0, Math.floor(Number(i.qty) || 0)) }));
+      await fetch(`${SUPABASE_URL}/rest/v1/bot_settings`, {
+        method: "POST",
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates",
+        },
+        body: JSON.stringify({ key: `order:${messageId}`, value: JSON.stringify(items), updated_at: new Date().toISOString() }),
+      }).catch((e) => console.error("store order failed", e));
+    }
+
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
