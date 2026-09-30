@@ -36,6 +36,19 @@ async function setSetting(key: string, value: string) {
   if (!res.ok) console.error(`setSetting failed [${res.status}]:`, await res.text());
 }
 
+async function getStock(): Promise<Record<string, number>> {
+  const raw = await getSetting("stock");
+  try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
+}
+
+function formatStock(stock: Record<string, number>): string {
+  const keys = Object.keys(stock);
+  if (!keys.length) return "📦 Brak ustawionego stanu.";
+  return "📦 <b>STAN SMAKÓW</b>\n" + keys
+    .map((k) => `• ${k}: ${stock[k] > 0 ? `<b>${stock[k]} szt.</b>` : "🚫 SOLD OUT"}`)
+    .join("\n");
+}
+
 async function deriveSecret(key: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`telegram-webhook:${key}`));
   return btoa(String.fromCharCode(...new Uint8Array(digest)))
@@ -183,6 +196,37 @@ Deno.serve(async (req) => {
           LOVABLE_API_KEY,
           TELEGRAM_API_KEY,
         );
+
+        // Deduct stock once when marked as shipped.
+        if (action === "ship" && cq.message?.message_id) {
+          const mid = cq.message.message_id;
+          const already = await getSetting(`shipped:${mid}`);
+          const itemsRaw = await getSetting(`order:${mid}`);
+          if (!already && itemsRaw) {
+            await setSetting(`shipped:${mid}`, "1");
+            const items = JSON.parse(itemsRaw) as Array<{ flavor: string; qty: number }>;
+            const stock = await getStock();
+            const soldOut: string[] = [];
+            const lines: string[] = [];
+            for (const it of items) {
+              const k = it.flavor.toLowerCase();
+              if (!(k in stock)) continue;
+              const before = stock[k];
+              stock[k] = Math.max(0, before - it.qty);
+              lines.push(`• ${it.flavor}: ${before} → ${stock[k]}`);
+              if (before > 0 && stock[k] === 0) soldOut.push(it.flavor);
+            }
+            await setSetting("stock", JSON.stringify(stock));
+            if (lines.length || soldOut.length) {
+              await tg("sendMessage", {
+                chat_id: cq.message.chat.id,
+                reply_to_message_id: mid,
+                text: "📉 Odjęto ze stanu:\n" + lines.join("\n") +
+                  (soldOut.length ? `\n\n🚫 SOLD OUT: ${soldOut.join(", ")}` : ""),
+              }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+            }
+          }
+        }
       } else {
 
         await tg("answerCallbackQuery", { callback_query_id: cq.id }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
@@ -262,6 +306,41 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true }), {
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    // Owner-only: /stan — set or show flavor stock.
+    const stanMatch = text.trim().match(/^\/stan(?:@\w+)?(?:\s+([\s\S]+))?$/i);
+    if (stanMatch) {
+      if (String(chat.id) !== String(OWNER_CHAT_ID)) {
+        return new Response(JSON.stringify({ ok: true }));
+      }
+      const stock = await getStock();
+      const body = stanMatch[1]?.trim();
+      if (body) {
+        const bad: string[] = [];
+        for (const raw of body.split(/[\n,;]+/)) {
+          const line = raw.trim();
+          if (!line) continue;
+          const m = line.match(/^(.+?)\s*[:=\-]?\s*(\d+)$/);
+          if (!m) { bad.push(line); continue; }
+          stock[m[1].trim().toLowerCase()] = parseInt(m[2], 10);
+        }
+        await setSetting("stock", JSON.stringify(stock));
+        await tg("sendMessage", {
+          chat_id: chat.id,
+          text: "✅ Stan zaktualizowany.\n\n" + formatStock(stock) +
+            (bad.length ? `\n\n⚠️ Nie zrozumiałem: ${bad.join(", ")}` : ""),
+          parse_mode: "HTML",
+        }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+      } else {
+        await tg("sendMessage", {
+          chat_id: chat.id,
+          text: formatStock(stock) +
+            "\n\n✍️ Ustaw stan:\n<code>/stan\nmixed berry: 10\ncola ice: 5</code>",
+          parse_mode: "HTML",
+        }, LOVABLE_API_KEY, TELEGRAM_API_KEY);
+      }
+      return new Response(JSON.stringify({ ok: true }));
     }
 
     const isCommand = /^\/(start|shop|sklep)(@\w+)?\b/i.test(text.trim());
