@@ -261,12 +261,12 @@ const Index = () => {
 
             <div className="mt-6">
               <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
-                {product.flavors.length > 0 ? t.pickFlavor : ""}
+                {shopFlavors.length > 0 ? t.pickFlavor : "SOLD OUT"}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {product.flavors.map((f) => {
+                {shopFlavors.map((f) => {
                   const active = flavor === f;
-                  const soldOut = stock[f.toLowerCase()] === 0;
+                  const soldOut = inCart(f) >= stockOf(f);
                   return (
                     <button
                       key={f}
@@ -334,7 +334,8 @@ const Index = () => {
                     <span className="w-5 text-center text-sm font-semibold">{i.qty}</span>
                     <button
                       onClick={() => add(i.productId, i.flavor)}
-                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
+                      disabled={i.qty >= stockOf(i.flavor)}
+                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
