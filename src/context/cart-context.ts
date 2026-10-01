@@ -12,6 +12,10 @@ export type CartContextValue = {
   unitPriceOfProduct: (productId: string) => number;
   count: number;
   total: number;
+  /** Stock keyed by lowercase flavor name. */
+  stock: Record<string, number>;
+  stockOf: (flavor: string) => number;
+  refreshStock: () => Promise<void>;
 };
 
 export const CartContext = createContext<CartContextValue | null>(null);
