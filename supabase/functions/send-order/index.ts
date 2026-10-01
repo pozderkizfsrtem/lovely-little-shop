@@ -61,6 +61,36 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Validate against current flavor stock.
+    {
+      const SB_URL = Deno.env.get("SUPABASE_URL")!;
+      const SK = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const r = await fetch(`${SB_URL}/rest/v1/bot_settings?key=eq.stock&select=value`, {
+        headers: { apikey: SK, Authorization: `Bearer ${SK}` },
+      });
+      const rows = r.ok ? ((await r.json()) as Array<{ value: string }>) : [];
+      let stock: Record<string, number> = {};
+      try { stock = rows[0]?.value ? JSON.parse(rows[0].value) : {}; } catch { stock = {}; }
+      const wanted: Record<string, number> = {};
+      for (const i of payload.items) {
+        const q = Number(i.qty);
+        if (!Number.isInteger(q) || q < 1) {
+          return new Response(JSON.stringify({ success: false, error: "Invalid quantity" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        const k = String(i.flavor).toLowerCase();
+        wanted[k] = (wanted[k] ?? 0) + q;
+      }
+      const tooMany = Object.entries(wanted).filter(([k, q]) => q > (stock[k] ?? 0));
+      if (tooMany.length) {
+        const list = tooMany.map(([k]) => `${k} (max ${stock[k] ?? 0})`).join(", ");
+        return new Response(JSON.stringify({ success: false, error: `Brak wystarczającej ilości: ${list}` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const totalQty = payload.items.reduce((s, i) => s + i.qty, 0);
     const itemsText = payload.items
       .map(

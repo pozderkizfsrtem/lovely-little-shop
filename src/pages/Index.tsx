@@ -33,23 +33,24 @@ const LANGUAGES = [
 const FEATURED_PRODUCT_ID = "zooy";
 
 const Index = () => {
-  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct } = useCart();
+  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct, stock, stockOf } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
   const [flavor, setFlavor] = useState<string | null>(null);
-  const [stock, setStock] = useState<Record<string, number>>({});
-  useEffect(() => {
-    supabase.functions.invoke("get-stock").then(({ data }) => {
-      if (data?.stock) setStock(data.stock);
-    });
-  }, []);
 
   const product = findProduct(FEATURED_PRODUCT_ID)!;
   const currentQty = qtyOfProduct(product.id);
   const currentUnit = unitPriceFor(product, currentQty);
 
+  // Flavors come only from the stock set via the bot (/stan).
+  const displayName = (key: string) =>
+    product.flavors.find((f) => f.toLowerCase() === key) ??
+    key.replace(/\b\w/g, (c) => c.toUpperCase());
+  const shopFlavors = Object.keys(stock).map(displayName);
+
   const productLines = items.filter((i) => i.productId === product.id);
+  const inCart = (f: string) => productLines.find((l) => l.flavor === f)?.qty ?? 0;
   const usedFlavors = new Set(productLines.map((l) => l.flavor));
-  const remainingFlavors = product.flavors.filter((f) => !usedFlavors.has(f));
+  const remainingFlavors = shopFlavors.filter((f) => !usedFlavors.has(f) && stockOf(f) > 0);
 
   const handleAdd = () => {
     if (!flavor) return;
@@ -260,12 +261,12 @@ const Index = () => {
 
             <div className="mt-6">
               <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
-                {product.flavors.length > 0 ? t.pickFlavor : ""}
+                {shopFlavors.length > 0 ? t.pickFlavor : "SOLD OUT"}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {product.flavors.map((f) => {
+                {shopFlavors.map((f) => {
                   const active = flavor === f;
-                  const soldOut = stock[f.toLowerCase()] === 0;
+                  const soldOut = inCart(f) >= stockOf(f);
                   return (
                     <button
                       key={f}
@@ -333,7 +334,8 @@ const Index = () => {
                     <span className="w-5 text-center text-sm font-semibold">{i.qty}</span>
                     <button
                       onClick={() => add(i.productId, i.flavor)}
-                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors"
+                      disabled={i.qty >= stockOf(i.flavor)}
+                      className="w-7 h-7 rounded-md border border-border hover:border-primary hover:text-primary flex items-center justify-center transition-colors disabled:opacity-30 disabled:pointer-events-none"
                     >
                       <Plus className="w-3 h-3" />
                     </button>

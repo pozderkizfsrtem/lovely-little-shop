@@ -318,13 +318,16 @@ Deno.serve(async (req) => {
       const body = stanMatch[1]?.trim();
       if (body) {
         const bad: string[] = [];
-        for (const raw of body.split(/[\n,;]+/)) {
-          const line = raw.trim();
-          if (!line) continue;
-          const m = line.match(/^(.+?)\s*[:=\-]?\s*(\d+)$/);
-          if (!m) { bad.push(line); continue; }
-          stock[m[1].trim().toLowerCase()] = parseInt(m[2], 10);
+        // Accepts "name: 10" pairs separated by newlines, commas or just spaces.
+        const re = /([^\d:=,;\n]+?)\s*[:=\-]?\s*(\d+)/g;
+        let m: RegExpExecArray | null;
+        let consumed = "";
+        while ((m = re.exec(body))) {
+          const name = m[1].trim().toLowerCase();
+          if (name) stock[name] = parseInt(m[2], 10);
+          consumed += m[0];
         }
+        if (!consumed) bad.push(body);
         await setSetting("stock", JSON.stringify(stock));
         await tg("sendMessage", {
           chat_id: chat.id,

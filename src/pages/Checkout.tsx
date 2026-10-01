@@ -30,7 +30,7 @@ const makeSchema = (t: Translation) =>
   });
 
 const Checkout = () => {
-  const { items, total, count, unitPriceOfProduct, clear } = useCart();
+  const { items, total, count, unitPriceOfProduct, clear, refreshStock } = useCart();
   const { lang, t } = useLang();
   const [submitting, setSubmitting] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -91,9 +91,11 @@ const Checkout = () => {
       toast.success(t.checkout.success);
       clear();
       navigate("/");
+      refreshStock();
     } catch (err) {
       const msg = err instanceof Error ? err.message : t.checkout.unknownError;
       toast.error(`${t.checkout.failPrefix}: ${msg}`);
+      refreshStock();
     } finally {
       setSubmitting(false);
     }
