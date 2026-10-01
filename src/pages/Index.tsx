@@ -33,23 +33,24 @@ const LANGUAGES = [
 const FEATURED_PRODUCT_ID = "zooy";
 
 const Index = () => {
-  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct } = useCart();
+  const { items, add, sub, removeFlavor, count, total, unitPriceOfProduct, qtyOfProduct, stock, stockOf } = useCart();
   const { lang, setLang, t, tFlavor } = useLang();
   const [flavor, setFlavor] = useState<string | null>(null);
-  const [stock, setStock] = useState<Record<string, number>>({});
-  useEffect(() => {
-    supabase.functions.invoke("get-stock").then(({ data }) => {
-      if (data?.stock) setStock(data.stock);
-    });
-  }, []);
 
   const product = findProduct(FEATURED_PRODUCT_ID)!;
   const currentQty = qtyOfProduct(product.id);
   const currentUnit = unitPriceFor(product, currentQty);
 
+  // Flavors come only from the stock set via the bot (/stan).
+  const displayName = (key: string) =>
+    product.flavors.find((f) => f.toLowerCase() === key) ??
+    key.replace(/\b\w/g, (c) => c.toUpperCase());
+  const shopFlavors = Object.keys(stock).map(displayName);
+
   const productLines = items.filter((i) => i.productId === product.id);
+  const inCart = (f: string) => productLines.find((l) => l.flavor === f)?.qty ?? 0;
   const usedFlavors = new Set(productLines.map((l) => l.flavor));
-  const remainingFlavors = product.flavors.filter((f) => !usedFlavors.has(f));
+  const remainingFlavors = shopFlavors.filter((f) => !usedFlavors.has(f) && stockOf(f) > 0);
 
   const handleAdd = () => {
     if (!flavor) return;
